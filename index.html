@@ -1,0 +1,3321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pygame — Полное руководство | Интерактивная презентация</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1e1e1e;
+            --bg-secondary: #252526;
+            --bg-tertiary: #2d2d30;
+            --bg-hover: #3e3e42;
+            --text-primary: #d4d4d4;
+            --text-secondary: #858585;
+            --text-bright: #ffffff;
+            --accent-green: #4ec9b0;
+            --accent-orange: #ce9178;
+            --accent-blue: #569cd6;
+            --accent-yellow: #dcdcaa;
+            --accent-pink: #c586c0;
+            --border: #3e3e42;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+            --transition: 0.3s ease;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.7;
+            font-size: 16px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-bright);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title .logo {
+            font-size: 1.4rem;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-variant-numeric: tabular-nums;
+            min-width: 110px;
+            text-align: right;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-green);
+            transition: width var(--transition);
+            border-radius: 2px;
+        }
+
+        .main-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 32px 100px;
+            min-height: calc(100vh - 70px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-number {
+            display: inline-block;
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .slide-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .slide-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            font-weight: 400;
+        }
+
+        .slide-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .text-block {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .text-block h3 {
+            color: var(--accent-green);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .text-block p {
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .text-block p:last-child {
+            margin-bottom: 0;
+        }
+
+        .text-block ul, .text-block ol {
+            margin-left: 24px;
+            margin-bottom: 12px;
+        }
+
+        .text-block li {
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .text-block li::marker {
+            color: var(--accent-green);
+        }
+
+        .highlight {
+            color: var(--accent-orange);
+            font-weight: 500;
+        }
+
+        .inline-code {
+            background: var(--bg-tertiary);
+            color: var(--accent-orange);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+
+        .code-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-label {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .copy-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-color: var(--accent-green);
+        }
+
+        .copy-btn.copied {
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .code-body {
+            padding: 16px;
+            overflow-x: auto;
+            background: #2d2d2d;
+        }
+
+        .code-body pre {
+            margin: 0;
+            background: transparent;
+            padding: 0;
+        }
+
+        .code-body code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #d4d4d4;
+        }
+
+        .code-body .keyword { color: #c586c0; }
+        .code-body .function { color: #dcdcaa; }
+        .code-body .string { color: #ce9178; }
+        .code-body .comment { color: #6a9955; font-style: italic; }
+        .code-body .number { color: #b5cea8; }
+        .code-body .builtin { color: #4ec9b0; }
+
+        .collapsible-code {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .collapse-btn {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: none;
+            color: var(--text-primary);
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background var(--transition);
+        }
+
+        .collapse-btn:hover {
+            background: var(--bg-hover);
+        }
+
+        .collapse-btn .arrow {
+            transition: transform var(--transition);
+            font-size: 0.8rem;
+        }
+
+        .collapse-btn.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .collapse-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .collapse-content.open {
+            max-height: 2000px;
+        }
+
+        .viz-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .viz-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .viz-header h3 {
+            color: var(--accent-green);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .viz-canvas-wrapper {
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+
+        .viz-canvas {
+            background: #1a1a2e;
+            border-radius: 4px;
+            display: block;
+        }
+
+        .viz-controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .viz-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .viz-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-green);
+        }
+
+        .viz-btn.active {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            border-color: var(--accent-green);
+        }
+
+        .viz-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .viz-info {
+            margin-top: 12px;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-left: 3px solid var(--accent-green);
+            line-height: 1.5;
+        }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .concept-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            transition: border-color var(--transition);
+        }
+
+        .concept-card:hover {
+            border-color: var(--accent-green);
+        }
+
+        .concept-card .icon {
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+        }
+
+        .concept-card h4 {
+            color: var(--text-bright);
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .concept-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .flow-diagram {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .flow-step .step-num {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .flow-step .step-text {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .flow-step .step-code {
+            color: var(--accent-orange);
+            font-family: 'Consolas', monospace;
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .flow-arrow {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        .nav-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 100;
+            box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 10px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--bg-hover);
+            border-color: var(--accent-green);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .nav-btn.primary {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            border-color: var(--accent-green);
+        }
+
+        .nav-btn.primary:hover:not(:disabled) {
+            background: #5dd4b8;
+        }
+
+        .nav-dots {
+            display: flex;
+            gap: 8px;
+            margin: 0 16px;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .nav-dot.active {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .nav-dot:hover {
+            border-color: var(--accent-green);
+        }
+
+        .kbd-hint {
+            position: fixed;
+            bottom: 80px;
+            right: 32px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .kbd {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 1px 6px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 16px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .progress-bar {
+                width: 120px;
+            }
+
+            .main-container {
+                padding: 24px 16px 100px;
+            }
+
+            .slide-title {
+                font-size: 1.5rem;
+            }
+
+            .nav-container {
+                padding: 12px 16px;
+            }
+
+            .nav-btn {
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+
+            .kbd-hint {
+                display: none;
+            }
+
+            .concept-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-title">
+            <span class="logo">🎮</span>
+            <span>Pygame — Полное руководство</span>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 6.25%"></div>
+            </div>
+            <div class="progress-text" id="progressText">Слайд 1 из 16</div>
+        </div>
+    </header>
+
+    <main class="main-container">
+
+        <!-- СЛАЙД 1: ВВЕДЕНИЕ -->
+        <section class="slide active" data-slide="1">
+            <span class="slide-number">СЛАЙД 1 / 16</span>
+            <h1 class="slide-title">Что такое Pygame?</h1>
+            <p class="slide-subtitle">Библиотека Python для создания игр и графических приложений</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3>📖 Определение</h3>
+                    <p><span class="highlight">Pygame</span> — это набор модулей (частей) языка Python, которые позволяют создавать игры, рисовать фигуры, работать со звуком и обрабатывать нажатия клавиш.</p>
+                    <p>Проще говоря: Pygame даёт вам инструменты, чтобы превратить текст программы в <strong>визуальное окно</strong>, где что-то происходит на экране.</p>
+                </div>
+
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <div class="icon">🎯</div>
+                        <h4>Простота</h4>
+                        <p>Минимум кода для создания окна и отрисовки фигур. Идеально для начинающих.</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="icon">📐</div>
+                        <h4>Логичность</h4>
+                        <p>Чёткая структура: инициализация → цикл → события → отрисовка → обновление.</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="icon">🌍</div>
+                        <h4>Популярность</h4>
+                        <p>Используется в школах, университетах и на курсах по всему миру.</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="icon"></div>
+                        <h4>Возможности</h4>
+                        <p>2D-графика, звук, обработка клавиатуры и мыши, работа с изображениями.</p>
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3>️ Как это работает (общая схема)</h3>
+                    <ol>
+                        <li>Вы пишете код на Python с использованием модуля <span class="inline-code">pygame</span>.</li>
+                        <li>Запускаете программу — открывается окно на экране.</li>
+                        <li>Программа работает в бесконечном цикле, пока вы не закроете окно.</li>
+                        <li>В цикле программа: слушает события → обновляет данные → рисует на экране.</li>
+                    </ol>
+                </div>
+
+                <div class="collapsible-code">
+                    <button class="collapse-btn" onclick="toggleCollapse(this)">
+                        <span>📄 Показать минимальный пример программы на Pygame</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div class="collapse-content">
+                        <div class="code-container">
+                            <div class="code-header">
+                                <span class="code-label">Python — минимальная программа</span>
+                                <button class="copy-btn" onclick="copyCode(this)"> Копировать</button>
+                            </div>
+                            <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame  <span class="comment"># Подключаем библиотеку Pygame</span>
+
+pygame.init()  <span class="comment"># Запускаем все системы Pygame</span>
+
+<span class="comment"># Создаём окно размером 400x300 пикселей</span>
+screen = pygame.display.set_mode((<span class="number">400</span>, <span class="number">300</span>))
+
+<span class="comment"># Бесконечный цикл — программа работает, пока окно открыто</span>
+running = <span class="builtin">True</span>
+<span class="keyword">while</span> running:
+    <span class="comment"># Проверяем все события (нажатия клавиш, закрытие окна)</span>
+    <span class="keyword">for</span> event <span class="keyword">in</span> pygame.event.get():
+        <span class="keyword">if</span> event.type == pygame.QUIT:  <span class="comment"># Если нажали крестик</span>
+            running = <span class="builtin">False</span>  <span class="comment"># Останавливаем цикл</span>
+
+    <span class="comment"># Заполняем экран чёрным цветом</span>
+    screen.fill((<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))
+
+    <span class="comment"># Показываем результат на экране</span>
+    pygame.display.flip()
+
+pygame.quit()  <span class="comment"># Завершаем работу Pygame</span></code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 2: ИНИЦИАЛИЗАЦИЯ -->
+        <section class="slide" data-slide="2">
+            <span class="slide-number">СЛАЙД 2 / 16</span>
+            <h1 class="slide-title">Инициализация и создание экрана</h1>
+            <p class="slide-subtitle">Два обязательных шага перед началом работы</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3>⚙️ Шаг 1: <span class="inline-code">pygame.init()</span></h3>
+                    <p>Эта команда <strong>запускает все внутренние системы</strong> Pygame: графику, звук, шрифты, ввод с клавиатуры.</p>
+                    <p>Без этой строки остальные команды Pygame не будут работать. Её всегда пишут в самом начале программы.</p>
+                    <p style="margin-top: 12px;"><strong>Что происходит:</strong> Pygame готовит все инструменты к работе.</p>
+                </div>
+
+                <div class="text-block">
+                    <h3>🖼️ Шаг 2: <span class="inline-code">pygame.display.set_mode()</span></h3>
+                    <p>Эта команда <strong>создаёт окно</strong> на экране компьютера. Окно — это «холст», на котором вы будете рисовать.</p>
+                    <p>В скобках указывается размер окна в пикселях: <span class="inline-code">(ширина, высота)</span>.</p>
+                    <ul>
+                        <li><span class="inline-code">(400, 300)</span> — окно 400 пикселей в ширину и 300 в высоту</li>
+                        <li><span class="inline-code">(800, 600)</span> — окно побольше</li>
+                    </ul>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-label">Python — инициализация и экран</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    </div>
+                    <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame  <span class="comment"># Подключаем библиотеку</span>
+
+pygame.init()  <span class="comment"># Запускаем все системы Pygame</span>
+
+<span class="comment"># Создаём окно размером 600x400 пикселей</span>
+<span class="comment"># set_mode возвращает объект "screen" — наш холст для рисования</span>
+screen = pygame.display.set_mode((<span class="number">600</span>, <span class="number">400</span>))
+
+<span class="comment"># Меняем заголовок окна (необязательно, но удобно)</span>
+pygame.display.set_caption(<span class="string">"Моя первая игра"</span>)</code></pre>
+                    </div>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <span></span>
+                        <h3>Интерактивная визуализация: создание окна</h3>
+                    </div>
+                    <div class="viz-canvas-wrapper">
+                        <canvas id="canvas1" class="viz-canvas" width="400" height="250"></canvas>
+                    </div>
+                    <div class="viz-controls">
+                        <button class="viz-btn" onclick="viz1_init()">1. pygame.init()</button>
+                        <button class="viz-btn" onclick="viz1_createWindow()">2. set_mode(400, 250)</button>
+                        <button class="viz-btn" onclick="viz1_setTitle()">3. set_caption()</button>
+                        <button class="viz-btn" onclick="viz1_reset()">🔄 Сброс</button>
+                    </div>
+                    <div class="viz-info" id="viz1Info">
+                        Нажмите кнопки по порядку, чтобы увидеть, как создаётся окно Pygame.
+                    </div>
+                </div>
+
+                <div class="flow-diagram">
+                    <div class="flow-step">
+                        <div class="step-num">1</div>
+                        <div>
+                            <div class="step-text">Импорт библиотеки</div>
+                            <div class="step-code">import pygame</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">
+                        <div class="step-num">2</div>
+                        <div>
+                            <div class="step-text">Инициализация систем</div>
+                            <div class="step-code">pygame.init()</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">
+                        <div class="step-num">3</div>
+                        <div>
+                            <div class="step-text">Создание окна (холста)</div>
+                            <div class="step-code">screen = pygame.display.set_mode((600, 400))</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 3: ИГРОВОЙ ЦИКЛ -->
+        <section class="slide" data-slide="3">
+            <span class="slide-number">СЛАЙД 3 / 16</span>
+            <h1 class="slide-title">Игровой цикл (Game Loop)</h1>
+            <p class="slide-subtitle">Сердце любой игры — бесконечный цикл, который не даёт программе закрыться</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3>🔄 Зачем нужен цикл?</h3>
+                    <p>Если написать программу без цикла, она выполнится один раз и сразу закроется. Окно появится и исчезнет за долю секунды.</p>
+                    <p><span class="highlight">Игровой цикл</span> — это бесконечный цикл <span class="inline-code">while running:</span>, который постоянно повторяет три действия:</p>
+                    <ol>
+                        <li><strong>Слушает события</strong> (нажатия клавиш, движение мыши, закрытие окна)</li>
+                        <li><strong>Обновляет данные</strong> (двигает объекты, меняет счёт)</li>
+                        <li><strong>Рисует на экране</strong> (показывает текущее состояние)</li>
+                    </ol>
+                </div>
+
+                <div class="text-block">
+                    <h3>⏱️ clock.tick() — контроль скорости</h3>
+                    <p>Функция <span class="inline-code">clock.tick(60)</span> ограничивает цикл до <strong>60 повторений в секунду</strong> (60 FPS).</p>
+                    <p>Без этого цикл работал бы слишком быстро (тысячи раз в секунду), и игра была бы неуправляемой.</p>
+                    <p style="margin-top: 12px;"><strong>Что происходит:</strong> Программа делает паузу, чтобы цикл работал с нужной скоростью.</p>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-label">Python — структура игрового цикла</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    </div>
+                    <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame
+
+pygame.init()
+screen = pygame.display.set_mode((<span class="number">600</span>, <span class="number">400</span>))
+
+<span class="comment"># Создаём объект clock для контроля скорости</span>
+clock = pygame.time.Clock()
+
+running = <span class="builtin">True</span>
+<span class="keyword">while</span> running:  <span class="comment"># БЕСКОНЕЧНЫЙ ЦИКЛ — основа игры</span>
+    
+    <span class="comment"># 1. ОБРАБОТКА СОБЫТИЙ</span>
+    <span class="keyword">for</span> event <span class="keyword">in</span> pygame.event.get():
+        <span class="keyword">if</span> event.type == pygame.QUIT:
+            running = <span class="builtin">False</span>
+
+    <span class="comment"># 2. ОБНОВЛЕНИЕ ДАННЫХ</span>
+    <span class="comment"># (здесь меняются координаты объектов, счёт и т.д.)</span>
+
+    <span class="comment"># 3. ОТРИСОВКА</span>
+    screen.fill((<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))  <span class="comment"># Очищаем экран чёрным цветом</span>
+    <span class="comment"># (здесь рисуем фигуры, текст, изображения)</span>
+
+    <span class="comment"># 4. ОБНОВЛЕНИЕ ЭКРАНА</span>
+    pygame.display.flip()  <span class="comment"># Показываем результат</span>
+
+    <span class="comment"># 5. КОНТРОЛЬ СКОРОСТИ</span>
+    clock.tick(<span class="number">60</span>)  <span class="comment"># Ограничиваем до 60 кадров в секунду</span>
+
+pygame.quit()</code></pre>
+                    </div>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <span>🔄</span>
+                        <h3>Визуализация: как работает цикл</h3>
+                    </div>
+                    <div class="viz-canvas-wrapper">
+                        <canvas id="canvas3" class="viz-canvas" width="400" height="200"></canvas>
+                    </div>
+                    <div class="viz-controls">
+                        <button class="viz-btn" id="btnLoopStart" onclick="viz3_start()">▶ Запустить цикл</button>
+                        <button class="viz-btn" id="btnLoopStop" onclick="viz3_stop()" disabled>⏹ Остановить</button>
+                        <button class="viz-btn" onclick="viz3_reset()">🔄 Сброс</button>
+                    </div>
+                    <div class="viz-info" id="viz3Info">
+                        Нажмите «Запустить цикл», чтобы увидеть, как программа повторяет действия снова и снова.
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3>⚠️ Важно: как остановить цикл?</h3>
+                    <p>Цикл <span class="inline-code">while True:</span> будет работать <strong>вечно</strong>. Чтобы программа могла завершиться, используют переменную-флаг:</p>
+                    <ul>
+                        <li><span class="inline-code">running = True</span> — цикл работает</li>
+                        <li><span class="inline-code">running = False</span> — цикл останавливается</li>
+                        <li>Значение меняется, когда пользователь закрывает окно (событие <span class="inline-code">QUIT</span>)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 4: СОБЫТИЯ -->
+        <section class="slide" data-slide="4">
+            <span class="slide-number">СЛАЙД 4 / 16</span>
+            <h1 class="slide-title">События (Events)</h1>
+            <p class="slide-subtitle">Как программа узнаёт о действиях пользователя</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3>👂 Что такое событие?</h3>
+                    <p><span class="highlight">Событие</span> — это сигнал о том, что что-то произошло: нажата клавиша, двигалась мышь, закрылось окно.</p>
+                    <p>Pygame собирает все события в <strong>очередь</strong>. Программа должна проверять эту очередь и реагировать на нужные события.</p>
+                </div>
+
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <div class="icon">❌</div>
+                        <h4>pygame.QUIT</h4>
+                        <p>Пользователь нажал крестик закрытия окна. Самое важное событие — без его обработки программу нельзя закрыть.</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="icon">⌨️</div>
+                        <h4>pygame.KEYDOWN</h4>
+                        <p>Пользователь нажал клавишу на клавиатуре. Можно узнать, какую именно.</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="icon">🖱️</div>
+                        <h4>pygame.MOUSEBUTTONDOWN</h4>
+                        <p>Пользователь нажал кнопку мыши. Можно узнать координаты клика.</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="icon">🔄</div>
+                        <h4>pygame.event.get()</h4>
+                        <p>Функция, которая возвращает список всех событий, произошедших с последнего вызова.</p>
+                    </div>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-label">Python — обработка событий</span>
+                        <button class="copy-btn" onclick="copyCode(this)"> Копировать</button>
+                    </div>
+                    <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame
+
+pygame.init()
+screen = pygame.display.set_mode((<span class="number">600</span>, <span class="number">400</span>))
+running = <span class="builtin">True</span>
+
+<span class="keyword">while</span> running:
+    <span class="comment"># Получаем список всех событий</span>
+    <span class="keyword">for</span> event <span class="keyword">in</span> pygame.event.get():
+
+        <span class="comment"># Проверяем: пользователь закрыл окно?</span>
+        <span class="keyword">if</span> event.type == pygame.QUIT:
+            running = <span class="builtin">False</span>  <span class="comment"># Останавливаем цикл</span>
+
+        <span class="comment"># Проверяем: нажата ли клавиша?</span>
+        <span class="keyword">if</span> event.type == pygame.KEYDOWN:
+            <span class="keyword">if</span> event.key == pygame.K_ESCAPE:
+                running = <span class="builtin">False</span>  <span class="comment"># Esc тоже закрывает программу</span>
+            <span class="keyword">if</span> event.key == pygame.K_SPACE:
+                print(<span class="string">"Нажат пробел!"</span>)  <span class="comment"># Действие на пробел</span>
+
+    screen.fill((<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))
+    pygame.display.flip()
+
+pygame.quit()</code></pre>
+                    </div>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <span>👂</span>
+                        <h3>Интерактив: имитация очереди событий</h3>
+                    </div>
+                    <div class="viz-canvas-wrapper" style="flex-direction: column; gap: 12px;">
+                        <canvas id="canvas4" class="viz-canvas" width="400" height="180"></canvas>
+                    </div>
+                    <div class="viz-controls">
+                        <button class="viz-btn" onclick="viz4_addEvent('QUIT')">Добавить QUIT</button>
+                        <button class="viz-btn" onclick="viz4_addEvent('KEYDOWN: A')">Добавить KEYDOWN (A)</button>
+                        <button class="viz-btn" onclick="viz4_addEvent('MOUSE')">Добавить MOUSE</button>
+                        <button class="viz-btn" onclick="viz4_process()">️ Обработать (event.get)</button>
+                        <button class="viz-btn" onclick="viz4_reset()">🔄 Сброс</button>
+                    </div>
+                    <div class="viz-info" id="viz4Info">
+                        Добавляйте события в очередь, затем нажмите «Обработать», чтобы увидеть, как программа их читает.
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3>📋 Структура обработки событий</h3>
+                    <ol>
+                        <li>Вызываем <span class="inline-code">pygame.event.get()</span> — получаем список событий.</li>
+                        <li>Проходим по списку в цикле <span class="inline-code">for event in ...</span>.</li>
+                        <li>Проверяем тип события: <span class="inline-code">if event.type == pygame.QUIT</span>.</li>
+                        <li>Выполняем нужное действие (например, <span class="inline-code">running = False</span>).</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 5: НЕПРЕРЫВНОЕ НАЖАТИЕ -->
+        <section class="slide" data-slide="5">
+            <span class="slide-number">СЛАЙД 5 / 16</span>
+            <h1 class="slide-title">Непрерывное нажатие клавиш (get_pressed)</h1>
+            <p class="slide-subtitle">Плавное движение при удержании клавиши</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3>🔑 Разница между event.get() и key.get_pressed()</h3>
+                    <p><span class="inline-code">pygame.event.get()</span> — возвращает список событий. Реагирует на <strong>одно нажатие</strong> клавиши.</p>
+                    <p><span class="inline-code">pygame.key.get_pressed()</span> — возвращает <strong>состояние всех клавиш</strong> в данный момент: нажата или нет.</p>
+                    <p style="margin-top: 12px;"><strong>Когда использовать:</strong></p>
+                    <ul>
+                        <li><span class="inline-code">event.get()</span> — для одиночных действий (прыжок, выстрел, пауза)</li>
+                        <li><span class="inline-code">key.get_pressed()</span> — для непрерывного движения (ходьба, бег)</li>
+                    </ul>
+                </div>
+
+                <div class="text-block">
+                    <h3> Как работает get_pressed()</h3>
+                    <p>Функция возвращает список (массив) из <strong>True</strong> и <strong>False</strong> для каждой клавиши:</p>
+                    <ul>
+                        <li>Если клавиша нажата — <span class="inline-code">True</span></li>
+                        <li>Если клавиша не нажата — <span class="inline-code">False</span></li>
+                    </ul>
+                    <p>Вы проверяете нужную клавишу по её коду: <span class="inline-code">keys[pygame.K_RIGHT]</span></p>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-label">Python — непрерывное движение</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    </div>
+                    <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame
+
+pygame.init()
+screen = pygame.display.set_mode((<span class="number">600</span>, <span class="number">400</span>))
+clock = pygame.time.Clock()
+
+<span class="comment"># Создаём игрока (квадрат)</span>
+player_x = <span class="number">100</span>
+player_y = <span class="number">200</span>
+player_speed = <span class="number">5</span>
+
+running = <span class="builtin">True</span>
+<span class="keyword">while</span> running:
+    <span class="keyword">for</span> event <span class="keyword">in</span> pygame.event.get():
+        <span class="keyword">if</span> event.type == pygame.QUIT:
+            running = <span class="builtin">False</span>
+
+    <span class="comment"># Получаем состояние всех клавиш</span>
+    keys = pygame.key.get_pressed()
+
+    <span class="comment"># Проверяем каждую клавишу</span>
+    <span class="keyword">if</span> keys[pygame.K_LEFT]:   <span class="comment"># Стрелка влево</span>
+        player_x -= player_speed
+    <span class="keyword">if</span> keys[pygame.K_RIGHT]:  <span class="comment"># Стрелка вправо</span>
+        player_x += player_speed
+    <span class="keyword">if</span> keys[pygame.K_UP]:     <span class="comment"># Стрелка вверх</span>
+        player_y -= player_speed
+    <span class="keyword">if</span> keys[pygame.K_DOWN]:   <span class="comment"># Стрелка вниз</span>
+        player_y += player_speed
+
+    <span class="comment"># Отрисовка</span>
+    screen.fill((<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))
+    pygame.draw.rect(screen, (<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), (player_x, player_y, <span class="number">50</span>, <span class="number">50</span>))
+    pygame.display.flip()
+
+    clock.tick(<span class="number">60</span>)
+
+pygame.quit()</code></pre>
+                    </div>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <span>🎮</span>
+                        <h3>Интерактив: непрерывное движение</h3>
+                    </div>
+                    <div class="viz-canvas-wrapper">
+                        <canvas id="canvas5" class="viz-canvas" width="400" height="250"></canvas>
+                    </div>
+                    <div class="viz-controls">
+                        <button class="viz-btn" id="btnLeft" onmousedown="viz5_startMove('left')" onmouseup="viz5_stopMove()" onmouseleave="viz5_stopMove()">⬅️ Влево</button>
+                        <button class="viz-btn" id="btnRight" onmousedown="viz5_startMove('right')" onmouseup="viz5_stopMove()" onmouseleave="viz5_stopMove()">➡️ Вправо</button>
+                        <button class="viz-btn" id="btnUp" onmousedown="viz5_startMove('up')" onmouseup="viz5_stopMove()" onmouseleave="viz5_stopMove()">⬆️ Вверх</button>
+                        <button class="viz-btn" id="btnDown" onmousedown="viz5_startMove('down')" onmouseup="viz5_stopMove()" onmouseleave="viz5_stopMove()">⬇️ Вниз</button>
+                        <button class="viz-btn" onclick="viz5_reset()">🔄 Сброс</button>
+                    </div>
+                    <div class="viz-info" id="viz5Info">
+                        Нажмите и удерживайте кнопки направления, чтобы двигать квадрат. Отпустите — движение остановится (как key.get_pressed()).
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3>⚠️ Важно</h3>
+                    <ul>
+                        <li><span class="inline-code">key.get_pressed()</span> вызывается <strong>вне</strong> цикла обработки событий.</li>
+                        <li>Движение происходит <strong>каждый кадр</strong>, пока клавиша нажата.</li>
+                        <li>Скорость движения контролируется переменной (например, <span class="inline-code">player_speed = 5</span>).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 6: КЛАСС SPRITE -->
+        <section class="slide" data-slide="6">
+            <span class="slide-number">СЛАЙД 6 / 16</span>
+            <h1 class="slide-title">Что такое класс Sprite?</h1>
+            <p class="slide-subtitle">Готовый шаблон (чертёж) для игровых объектов</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3>📋 Проблема: много объектов</h3>
+                    <p>Когда в игре много объектов (игрок, враги, пули), нужно хранить для каждого:</p>
+                    <ul>
+                        <li>Координаты X и Y</li>
+                        <li>Картинку (изображение)</li>
+                        <li>Скорость движения</li>
+                        <li>Другие свойства</li>
+                    </ul>
+                    <p>Если делать это вручную, код становится сложным и запутанным.</p>
+                </div>
+
+                <div class="text-block">
+                    <h3>✅ Решение: класс Sprite</h3>
+                    <p><span class="highlight">pygame.sprite.Sprite</span> — это готовый <strong>шаблон</strong> (чертёж) для игровых объектов.</p>
+                    <p>Вы создаёте свой класс на основе этого шаблона, и Pygame сам управляет координатами, картинкой и другими свойствами.</p>
+                    <p style="margin-top: 12px;"><strong>Аналогия:</strong> Sprite — это как анкета. У каждого объекта есть стандартные поля (имя, возраст, адрес), но значения разные.</p>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-label">Python — создание класса Sprite</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    </div>
+                    <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame
+
+<span class="comment"># Создаём свой класс на основе готового шаблона Sprite</span>
+<span class="keyword">class</span> <span class="function">Player</span>(pygame.sprite.Sprite):
+    <span class="comment"># Наследуем все свойства и методы от pygame.sprite.Sprite</span>
+    
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        <span class="comment"># Вызываем конструктор родительского класса</span>
+        super().__init__()
+        
+        <span class="comment"># Здесь мы задаём внешность и позицию спрайта</span>
+        <span class="comment"># (подробнее на следующем слайде)</span>
+        <span class="keyword">pass</span>
+
+<span class="comment"># Создаём объект игрока</span>
+player = Player()</code></pre>
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3>🔑 Ключевые моменты</h3>
+                    <ul>
+                        <li><span class="inline-code">class Player(pygame.sprite.Sprite):</span> — создаём класс <strong>Player</strong>, который наследует от <strong>Sprite</strong>.</li>
+                        <li><span class="inline-code">super().__init__()</span> — обязательно вызываем в начале. Это запускает внутренний код Pygame.</li>
+                        <li>После этого можно добавлять свои свойства и методы.</li>
+                    </ul>
+                </div>
+
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <div class="icon">📐</div>
+                        <h4>Структура</h4>
+                        <p>Sprite даёт стандартную структуру для всех игровых объектов.</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="icon">🔄</div>
+                        <h4>Удобство</h4>
+                        <p>Не нужно вручную хранить координаты и картинки для каждого объекта.</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="icon">👥</div>
+                        <h4>Группы</h4>
+                        <p>Sprites можно объединять в группы и управлять ими одной командой.</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="icon">⚙️</div>
+                        <h4>Методы</h4>
+                        <p>Готовые методы: update(), kill(), и другие для управления объектами.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 7: IMAGE И RECT -->
+        <section class="slide" data-slide="7">
+            <span class="slide-number">СЛАЙД 7 / 16</span>
+            <h1 class="slide-title">Два обязательных атрибута: image и rect</h1>
+            <p class="slide-subtitle">Внешность и позиция спрайта</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3>️ Правило: два обязательных свойства</h3>
+                    <p>У каждого спрайта <strong>ДОЛЖНЫ быть</strong> два свойства:</p>
+                    <ol>
+                        <li><span class="inline-code">self.image</span> — то, как спрайт <strong>выглядит</strong> (поверхность Surface).</li>
+                        <li><span class="inline-code">self.rect</span> — то, <strong>где он находится</strong> и какого он размера (прямоугольник).</li>
+                    </ol>
+                    <p>Без этих двух свойств спрайт не будет работать.</p>
+                </div>
+
+                <div class="text-block">
+                    <h3>🎨 self.image — внешность</h3>
+                    <p><span class="inline-code">self.image</span> — это <strong>поверхность</strong> (Surface), на которой нарисован спрайт.</p>
+                    <p>Можно создать простую поверхность и залить её цветом:</p>
+                    <ul>
+                        <li><span class="inline-code">pygame.Surface((50, 50))</span> — создаёт поверхность 50x50 пикселей</li>
+                        <li><span class="inline-code">image.fill((255, 0, 0))</span> — заливает красным цветом</li>
+                    </ul>
+                    <p>Или загрузить картинку из файла:</p>
+                    <ul>
+                        <li><span class="inline-code">pygame.image.load("player.png")</span> — загружает изображение</li>
+                    </ul>
+                </div>
+
+                <div class="text-block">
+                    <h3>📍 self.rect — позиция и размер</h3>
+                    <p><span class="inline-code">self.rect</span> — это <strong>прямоугольник</strong>, который определяет:</p>
+                    <ul>
+                        <li>Где находится спрайт (координаты x, y)</li>
+                        <li>Какого он размера (ширина, высота)</li>
+                    </ul>
+                    <p>Обычно создаётся автоматически из image:</p>
+                    <ul>
+                        <li><span class="inline-code">self.rect = self.image.get_rect()</span> — создаёт rect того же размера, что и image</li>
+                        <li><span class="inline-code">self.rect.x = 100</span> — устанавливает позицию по X</li>
+                        <li><span class="inline-code">self.rect.y = 200</span> — устанавливает позицию по Y</li>
+                    </ul>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-label">Python — создание простого спрайта (квадрата)</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    </div>
+                    <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame
+
+<span class="keyword">class</span> <span class="function">Player</span>(pygame.sprite.Sprite):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        super().__init__()  <span class="comment"># Обязательно!</span>
+        
+        <span class="comment"># Создаём поверхность (image) — квадрат 50x50 пикселей</span>
+        self.image = pygame.Surface((<span class="number">50</span>, <span class="number">50</span>))
+        self.image.fill((<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>))  <span class="comment"># Заливаем зелёным цветом</span>
+        
+        <span class="comment"># Создаём прямоугольник (rect) того же размера</span>
+        self.rect = self.image.get_rect()
+        
+        <span class="comment"># Устанавливаем начальную позицию</span>
+        self.rect.x = <span class="number">100</span>  <span class="comment"># Позиция по X</span>
+        self.rect.y = <span class="number">150</span>  <span class="comment"># Позиция по Y</span>
+
+<span class="comment"># Создаём объект игрока</span>
+player = Player()</code></pre>
+                    </div>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <span>🎨</span>
+                        <h3>Визуализация: image и rect</h3>
+                    </div>
+                    <div class="viz-canvas-wrapper">
+                        <canvas id="canvas7" class="viz-canvas" width="400" height="250"></canvas>
+                    </div>
+                    <div class="viz-controls">
+                        <button class="viz-btn" onclick="viz7_showImage()">Показать image</button>
+                        <button class="viz-btn" onclick="viz7_showRect()">Показать rect</button>
+                        <button class="viz-btn" onclick="viz7_showBoth()">Показать оба</button>
+                        <button class="viz-btn" onclick="viz7_reset()">🔄 Сброс</button>
+                    </div>
+                    <div class="viz-info" id="viz7Info">
+                        Нажмите кнопки, чтобы увидеть разницу между image (внешность) и rect (рамка позиции).
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3> Как это работает вместе</h3>
+                    <ol>
+                        <li><span class="inline-code">self.image</span> содержит картинку спрайта (например, зелёный квадрат).</li>
+                        <li><span class="inline-code">self.rect</span> содержит координаты и размер (например, x=100, y=150, ширина=50, высота=50).</li>
+                        <li>Когда Pygame рисует спрайт, он берёт картинку из <span class="inline-code">image</span> и размещает её по координатам из <span class="inline-code">rect</span>.</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 8: МЕТОД UPDATE -->
+        <section class="slide" data-slide="8">
+            <span class="slide-number">СЛАЙД 8 / 16</span>
+            <h1 class="slide-title">Метод update() — поведение и движение</h1>
+            <p class="slide-subtitle">Как спрайт меняет своё состояние</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3>🔄 Что такое update()?</h3>
+                    <p><span class="inline-code">update()</span> — это специальный метод, который вызывается, когда нужно <strong>обновить состояние</strong> спрайта.</p>
+                    <p>Например:</p>
+                    <ul>
+                        <li>Подвинуть спрайт</li>
+                        <li>Изменить направление</li>
+                        <li>Проверить столкновения</li>
+                        <li>Обновить анимацию</li>
+                    </ul>
+                    <p style="margin-top: 12px;"><strong>Когда вызывается:</strong> Обычно в игровом цикле, перед отрисовкой.</p>
+                </div>
+
+                <div class="text-block">
+                    <h3> Как написать update()</h3>
+                    <p>Вы добавляете метод <span class="inline-code">update()</span> в свой класс Sprite:</p>
+                    <ul>
+                        <li>Метод получает <span class="inline-code">self</span> — ссылку на сам спрайт</li>
+                        <li>Внутри метода вы меняете свойства спрайта (обычно <span class="inline-code">self.rect.x</span> или <span class="inline-code">self.rect.y</span>)</li>
+                    </ul>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-label">Python — метод update() для движения вправо</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    </div>
+                    <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame
+
+<span class="keyword">class</span> <span class="function">Player</span>(pygame.sprite.Sprite):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        super().__init__()
+        self.image = pygame.Surface((<span class="number">50</span>, <span class="number">50</span>))
+        self.image.fill((<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>))
+        self.rect = self.image.get_rect()
+        self.rect.x = <span class="number">50</span>  <span class="comment"># Начальная позиция</span>
+        self.rect.y = <span class="number">100</span>
+    
+    <span class="comment"># Метод update() — вызывается для обновления состояния</span>
+    <span class="keyword">def</span> <span class="function">update</span>(self):
+        <span class="comment"># Двигаем спрайт вправо на 5 пикселей</span>
+        self.rect.x += <span class="number">5</span>
+        
+        <span class="comment"># Если спрайт вышел за правый край экрана — возвращаем влево</span>
+        <span class="keyword">if</span> self.rect.x > <span class="number">600</span>:
+            self.rect.x = <span class="number">50</span>
+
+<span class="comment"># Создаём игрока</span>
+player = Player()
+
+<span class="comment"># В игровом цикле:</span>
+<span class="comment"># player.update()  # Вызываем update() каждый кадр</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <span>🔄</span>
+                        <h3>Интерактив: метод update()</h3>
+                    </div>
+                    <div class="viz-canvas-wrapper">
+                        <canvas id="canvas8" class="viz-canvas" width="400" height="200"></canvas>
+                    </div>
+                    <div class="viz-controls">
+                        <button class="viz-btn" onclick="viz8_update()">▶ Вызвать update()</button>
+                        <button class="viz-btn" onclick="viz8_updateMultiple()">⏭ update() x5</button>
+                        <button class="viz-btn" onclick="viz8_reset()">🔄 Сброс</button>
+                    </div>
+                    <div class="viz-info" id="viz8Info">
+                        Нажмите «Вызвать update()», чтобы сдвинуть квадрат вправо на 30 пикселей (как в коде: self.rect.x += 30).
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3>📋 Как использовать update() в игровом цикле</h3>
+                    <ol>
+                        <li>Создаёте спрайт: <span class="inline-code">player = Player()</span></li>
+                        <li>В игровом цикле вызываете: <span class="inline-code">player.update()</span></li>
+                        <li>Метод <span class="inline-code">update()</span> меняет координаты спрайта</li>
+                        <li>Pygame рисует спрайт на новой позиции</li>
+                    </ol>
+                    <p style="margin-top: 12px;"><strong>Результат:</strong> Спрайт двигается по экрану.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 9: МЕТОД KILL -->
+        <section class="slide" data-slide="9">
+            <span class="slide-number">СЛАЙД 9 / 16</span>
+            <h1 class="slide-title">Метод kill() — удаление спрайта</h1>
+            <p class="slide-subtitle">Как убрать объект из игры</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3>🗑️ Что делает kill()?</h3>
+                    <p>Метод <span class="inline-code">self.kill()</span> <strong>автоматически удаляет</strong> спрайт из всех групп, в которых он состоит.</p>
+                    <p>После вызова <span class="inline-code">kill()</span>:</p>
+                    <ul>
+                        <li>Спрайт больше не рисуется на экране</li>
+                        <li>Спрайт не получает события</li>
+                        <li>Спрайт не обновляется</li>
+                    </ul>
+                    <p style="margin-top: 12px;"><strong>Аналогия:</strong> Это как удалить файл из папки — он исчезает из списка.</p>
+                </div>
+
+                <div class="text-block">
+                    <h3> Когда вызывать kill()?</h3>
+                    <p>Обычно <span class="inline-code">kill()</span> вызывается при выполнении какого-то условия:</p>
+                    <ul>
+                        <li>Спрайт вышел за границы экрана</li>
+                        <li>Спрайт столкнулся с другим объектом</li>
+                        <li>Здоровье спрайта равно нулю</li>
+                        <li>Игрок нажал кнопку удаления</li>
+                    </ul>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-label">Python — метод kill() с условием</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    </div>
+                    <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame
+
+<span class="keyword">class</span> <span class="function">Bullet</span>(pygame.sprite.Sprite):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((<span class="number">10</span>, <span class="number">10</span>))
+        self.image.fill((<span class="number">255</span>, <span class="number">255</span>, <span class="number">0</span>))  <span class="comment"># Жёлтая пуля</span>
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+    
+    <span class="keyword">def</span> <span class="function">update</span>(self):
+        <span class="comment"># Двигаем пулю вверх</span>
+        self.rect.y -= <span class="number">10</span>
+        
+        <span class="comment"># Если пуля вышла за верхний край экрана — удаляем её</span>
+        <span class="keyword">if</span> self.rect.y < <span class="number">0</span>:
+            self.kill()  <span class="comment"># Удаляем спрайт из всех групп</span>
+
+<span class="comment"># Создаём пулю</span>
+bullet = Bullet(<span class="number">300</span>, <span class="number">400</span>)
+
+<span class="comment"># В игровом цикле:</span>
+<span class="comment"># bullet.update()  # Пуля двигается и автоматически удаляется при выходе за экран</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <span>🗑️</span>
+                        <h3>Интерактив: метод kill()</h3>
+                    </div>
+                    <div class="viz-canvas-wrapper">
+                        <canvas id="canvas9" class="viz-canvas" width="400" height="200"></canvas>
+                    </div>
+                    <div class="viz-controls">
+                        <button class="viz-btn" onclick="viz9_show()">Показать спрайт</button>
+                        <button class="viz-btn" onclick="viz9_kill()">🗑️ Вызвать kill()</button>
+                        <button class="viz-btn" onclick="viz9_reset()">🔄 Сброс</button>
+                    </div>
+                    <div class="viz-info" id="viz9Info">
+                        Нажмите «Показать спрайт», затем «Вызвать kill()», чтобы увидеть, как спрайт исчезает.
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3>⚠️ Важно: что происходит после kill()?</h3>
+                    <ul>
+                        <li>Спрайт <strong>удаляется из групп</strong>, но объект всё ещё существует в памяти Python.</li>
+                        <li>Если вы сохраните ссылку на спрайт (<span class="inline-code">bullet = Bullet(...)</span>), вы всё ещё можете обращаться к его свойствам.</li>
+                        <li>Но Pygame больше не будет его рисовать или обновлять.</li>
+                    </ul>
+                    <p style="margin-top: 12px;"><strong>Рекомендация:</strong> После <span class="inline-code">kill()</span> не используйте спрайт — создайте новый, если нужен.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 10: ГРУППЫ И СТОЛКНОВЕНИЯ -->
+        <section class="slide" data-slide="10">
+            <span class="slide-number">СЛАЙД 10 / 16</span>
+            <h1 class="slide-title">Группы спрайтов и функции отслеживания</h1>
+            <p class="slide-subtitle">Управление множеством объектов и проверка столкновений</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3> pygame.sprite.Group() — контейнер для спрайтов</h3>
+                    <p><span class="highlight">Группа</span> — это объект, который хранит множество спрайтов и позволяет управлять ими одной командой.</p>
+                    <p style="margin-top: 12px;"><strong>Методы группы:</strong></p>
+                    <ul>
+                        <li><span class="inline-code">group.add(sprite1, sprite2, ...)</span> — добавить спрайты в группу</li>
+                        <li><span class="inline-code">group.remove(sprite)</span> — удалить спрайт из группы</li>
+                        <li><span class="inline-code">group.update()</span> — вызвать <span class="inline-code">update()</span> для всех спрайтов</li>
+                        <li><span class="inline-code">group.draw(screen)</span> — нарисовать все спрайты на экране</li>
+                    </ul>
+                </div>
+
+                <div class="text-block">
+                    <h3>💥 Функции проверки столкновений</h3>
+                    <p>Pygame предоставляет готовые функции для проверки пересечения спрайтов:</p>
+                    
+                    <p style="margin-top: 16px;"><strong>1. spritecollide(sprite, group, dokill)</strong></p>
+                    <ul>
+                        <li>Проверяет столкновение <strong>одного спрайта</strong> со <strong>всеми спрайтами в группе</strong></li>
+                        <li>Возвращает список столкнувшихся спрайтов</li>
+                        <li>Параметр <span class="inline-code">dokill=True</span> — автоматически удаляет столкнувшиеся спрайты из группы</li>
+                    </ul>
+
+                    <p style="margin-top: 16px;"><strong>2. groupcollide(group1, group2, dokill1, dokill2)</strong></p>
+                    <ul>
+                        <li>Проверяет столкновения между <strong>всеми спрайтами</strong> первой группы и <strong>всеми спрайтами</strong> второй группы</li>
+                        <li>Возвращает словарь: ключ — спрайт из group1, значение — список столкнувшихся спрайтов из group2</li>
+                        <li>Параметры <span class="inline-code">dokill1</span> и <span class="inline-code">dokill2</span> — удалять ли спрайты из соответствующих групп</li>
+                    </ul>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-label">Python — группы и столкновения</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    </div>
+                    <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame
+
+<span class="keyword">class</span> <span class="function">Enemy</span>(pygame.sprite.Sprite):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((<span class="number">40</span>, <span class="number">40</span>))
+        self.image.fill((<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>))  <span class="comment"># Красный враг</span>
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+<span class="comment"># Создаём группу врагов</span>
+enemies = pygame.sprite.Group()
+
+<span class="comment"># Добавляем врагов</span>
+enemy1 = Enemy(<span class="number">100</span>, <span class="number">50</span>)
+enemy2 = Enemy(<span class="number">200</span>, <span class="number">50</span>)
+enemy3 = Enemy(<span class="number">300</span>, <span class="number">50</span>)
+enemies.add(enemy1, enemy2, enemy3)
+
+<span class="comment"># Создаём игрока</span>
+player = Player()
+
+<span class="comment"># В игровом цикле:</span>
+<span class="comment"># Проверяем столкновение игрока со всеми врагами</span>
+hit_enemies = pygame.sprite.spritecollide(player, enemies, <span class="builtin">False</span>)
+
+<span class="keyword">if</span> hit_enemies:
+    print(<span class="string">"Столкновение! Количество врагов:"</span>, len(hit_enemies))
+
+<span class="comment"># Или удаляем столкнувшихся врагов:</span>
+<span class="comment"># hit_enemies = pygame.sprite.spritecollide(player, enemies, True)</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <span>💥</span>
+                        <h3>Интерактив: проверка столкновений</h3>
+                    </div>
+                    <div class="viz-canvas-wrapper">
+                        <canvas id="canvas10" class="viz-canvas" width="400" height="250"></canvas>
+                    </div>
+                    <div class="viz-controls">
+                        <button class="viz-btn" onclick="viz10_movePlayer()">️ Двигать игрока</button>
+                        <button class="viz-btn" onclick="viz10_checkCollision()">🔍 Проверить spritecollide</button>
+                        <button class="viz-btn" onclick="viz10_reset()">🔄 Сброс</button>
+                    </div>
+                    <div class="viz-info" id="viz10Info">
+                        Двигайте синего игрока вправо. Нажмите «Проверить spritecollide», чтобы увидеть, с какими красными врагами он пересекается.
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3>📋 Когда использовать какую функцию?</h3>
+                    <ul>
+                        <li><strong>spritecollide</strong> — когда нужно проверить одного персонажа (игрока) против группы объектов (врагов, пуль)</li>
+                        <li><strong>groupcollide</strong> — когда нужно проверить столкновения между двумя группами (например, пули игрока против врагов)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 11: БАЗОВЫЕ СТОЛКНОВЕНИЯ -->
+        <section class="slide" data-slide="11">
+            <span class="slide-number">СЛАЙД 11 / 16</span>
+            <h1 class="slide-title">Базовые столкновения (Collision Detection)</h1>
+            <p class="slide-subtitle">Проверка пересечения двух конкретных спрайтов</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3> collide_rect() — проверка двух спрайтов</h3>
+                    <p>Функция <span class="inline-code">pygame.sprite.collide_rect(sprite1, sprite2)</span> проверяет, пересекаются ли <strong>два конкретных спрайта</strong>.</p>
+                    <p>Возвращает:</p>
+                    <ul>
+                        <li><span class="inline-code">True</span> — если спрайты пересекаются</li>
+                        <li><span class="inline-code">False</span> — если не пересекаются</li>
+                    </ul>
+                    <p style="margin-top: 12px;"><strong>Как работает:</strong> Сравнивает прямоугольники (<span class="inline-code">rect</span>) двух спрайтов. Если они пересекаются — столкновение есть.</p>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-label">Python — проверка столкновения двух спрайтов</span>
+                        <button class="copy-btn" onclick="copyCode(this)"> Копировать</button>
+                    </div>
+                    <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame
+
+<span class="comment"># Создаём два спрайта</span>
+player = Player()
+enemy = Enemy(<span class="number">200</span>, <span class="number">100</span>)
+
+<span class="comment"># В игровом цикле:</span>
+<span class="comment"># Проверяем столкновение</span>
+<span class="keyword">if</span> pygame.sprite.collide_rect(player, enemy):
+    <span class="comment"># Столкновение произошло!</span>
+    print(<span class="string">"Игрок столкнулся с врагом!"</span>)
+    <span class="comment"># Можно уменьшить здоровье, убрать жизнь и т.д.</span>
+    player.health -= <span class="number">10</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <span>📐</span>
+                        <h3>Интерактив: collide_rect()</h3>
+                    </div>
+                    <div class="viz-canvas-wrapper">
+                        <canvas id="canvas11" class="viz-canvas" width="400" height="200"></canvas>
+                    </div>
+                    <div class="viz-controls">
+                        <button class="viz-btn" onclick="viz11_movePlayer()">➡️ Двигать игрока</button>
+                        <button class="viz-btn" onclick="viz11_checkCollision()">🔍 Проверить столкновение</button>
+                        <button class="viz-btn" onclick="viz11_reset()">🔄 Сброс</button>
+                    </div>
+                    <div class="viz-info" id="viz11Info">
+                        Двигайте синего игрока вправо к красному врагу. Нажмите «Проверить столкновение», чтобы узнать, пересекаются ли они.
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3> Как определить столкновение?</h3>
+                    <p>Два прямоугольника пересекаются, если:</p>
+                    <ul>
+                        <li>Правый край первого > левого края второго</li>
+                        <li>Левый край первого < правого края второго</li>
+                        <li>Нижний край первого > верхнего края второго</li>
+                        <li>Верхний край первого < нижнего края второго</li>
+                    </ul>
+                    <p style="margin-top: 12px;">Pygame делает эту проверку автоматически через <span class="inline-code">collide_rect()</span>.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 12: BLIT И FLIP -->
+        <section class="slide" data-slide="12">
+            <span class="slide-number">СЛАЙД 12 / 16</span>
+            <h1 class="slide-title">blit() и flip(): Двойная буферизация</h1>
+            <p class="slide-subtitle">Разница между рисованием в памяти и показом на экране</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3>🖼️ Двойная буферизация</h3>
+                    <p>Pygame использует <span class="highlight">два «холста»</span> (буфера):</p>
+                    <ol>
+                        <li><strong>Видимый буфер</strong> — то, что сейчас показано на экране.</li>
+                        <li><strong>Невидимый буфер</strong> — то, на котором вы рисуете.</li>
+                    </ol>
+                    <p>Когда вы вызываете <span class="inline-code">pygame.draw.rect()</span>, фигура рисуется на <strong>невидимом буфере</strong>. Пользователь её ещё не видит.</p>
+                    <p>Чтобы показать результат, нужно вызвать <span class="inline-code">pygame.display.flip()</span> — эта команда <strong>меняет буферы местами</strong>, и нарисованное становится видимым.</p>
+                </div>
+
+                <div class="text-block">
+                    <h3> Аналогия: художник и витрина</h3>
+                    <p>Представьте художника, который рисует картину <strong>за занавеской</strong> (невидимый буфер).</p>
+                    <p>Зрители видят только готовую картину в <strong>витрине</strong> (видимый буфер).</p>
+                    <p>Когда художник заканчивает, он говорит: <span class="inline-code">flip()</span> — и занавеска открывается, показывая новую картину.</p>
+                    <p style="margin-top: 12px;"><strong>Зачем это нужно:</strong> Чтобы зрители не видели процесс рисования, только готовый результат.</p>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <span>🖼️</span>
+                        <h3>Визуализация: два буфера</h3>
+                    </div>
+                    <div class="viz-canvas-wrapper" style="flex-direction: column; gap: 16px;">
+                        <div style="display: flex; gap: 16px; width: 100%; justify-content: center; flex-wrap: wrap;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px;">📺 Видимый экран</div>
+                                <canvas id="canvas12Visible" class="viz-canvas" width="180" height="140"></canvas>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px;">🎨 Невидимый буфер (рисуем здесь)</div>
+                                <canvas id="canvas12Hidden" class="viz-canvas" width="180" height="140"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="viz-controls">
+                        <button class="viz-btn" onclick="viz12_draw()">🎨 Нарисовать фигуру</button>
+                        <button class="viz-btn" onclick="viz12_flip()">🔄 display.flip()</button>
+                        <button class="viz-btn" onclick="viz12_reset()"> Сброс</button>
+                    </div>
+                    <div class="viz-info" id="viz12Info">
+                        1. Нажмите «Нарисовать фигуру» — она появится в невидимом буфере.<br>
+                        2. Нажмите «display.flip()» — буферы поменяются, и фигура станет видимой.
+                    </div>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-label">Python — полный пример с обновлением экрана</span>
+                        <button class="copy-btn" onclick="copyCode(this)"> Копировать</button>
+                    </div>
+                    <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame
+
+pygame.init()
+screen = pygame.display.set_mode((<span class="number">600</span>, <span class="number">400</span>))
+
+RED = (<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>)
+BLUE = (<span class="number">0</span>, <span class="number">100</span>, <span class="number">255</span>)
+WHITE = (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)
+
+running = <span class="builtin">True</span>
+<span class="keyword">while</span> running:
+    <span class="keyword">for</span> event <span class="keyword">in</span> pygame.event.get():
+        <span class="keyword">if</span> event.type == pygame.QUIT:
+            running = <span class="builtin">False</span>
+
+    <span class="comment"># ШАГ 1: Очищаем невидимый буфер белым цветом</span>
+    screen.fill(WHITE)
+
+    <span class="comment"># ШАГ 2: Рисуем фигуры на невидимом буфере</span>
+    <span class="comment"># (пользователь пока ничего не видит!)</span>
+    pygame.draw.rect(screen, RED, (<span class="number">100</span>, <span class="number">100</span>, <span class="number">200</span>, <span class="number">150</span>))
+    pygame.draw.circle(screen, BLUE, (<span class="number">450</span>, <span class="number">200</span>), <span class="number">70</span>)
+
+    <span class="comment"># ШАГ 3: Показываем результат на экране</span>
+    <span class="comment"># Теперь пользователь видит нарисованное</span>
+    pygame.display.flip()
+
+pygame.quit()</code></pre>
+                    </div>
+                </div>
+
+                <div class="flow-diagram">
+                    <h3 style="color: var(--accent-green); margin-bottom: 12px;"> Порядок действий в каждом кадре</h3>
+                    <div class="flow-step">
+                        <div class="step-num">1</div>
+                        <div>
+                            <div class="step-text">Обработать события</div>
+                            <div class="step-code">for event in pygame.event.get(): ...</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">
+                        <div class="step-num">2</div>
+                        <div>
+                            <div class="step-text">Очистить экран (залить фоном)</div>
+                            <div class="step-code">screen.fill((0, 0, 0))</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">
+                        <div class="step-num">3</div>
+                        <div>
+                            <div class="step-text">Нарисовать все объекты</div>
+                            <div class="step-code">pygame.draw.rect(...), pygame.draw.circle(...)</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">
+                        <div class="step-num">4</div>
+                        <div>
+                            <div class="step-text">Показать результат на экране</div>
+                            <div class="step-code">pygame.display.flip()</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step" style="border-left-color: var(--accent-orange);">
+                        <div class="step-num" style="background: var(--accent-orange);">↻</div>
+                        <div>
+                            <div class="step-text">Повторить с шага 1 (следующий кадр)</div>
+                            <div class="step-code">while running: ...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 13: ШРИФТЫ И ТЕКСТ -->
+        <section class="slide" data-slide="13">
+            <span class="slide-number">СЛАЙД 13 / 16</span>
+            <h1 class="slide-title">Шрифты и текст (Fonts and Text)</h1>
+            <p class="slide-subtitle">Как отображать текст на экране</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3> 3 шага отображения текста</h3>
+                    <p>Чтобы показать текст в Pygame, нужно выполнить три действия:</p>
+                    <ol>
+                        <li><strong>Создать объект шрифта</strong> — выбрать размер и стиль</li>
+                        <li><strong>Отрисовать текст на поверхности</strong> — превратить текст в картинку</li>
+                        <li><strong>Показать поверхность на экране</strong> — использовать blit()</li>
+                    </ol>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-label">Python — отображение текста</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    </div>
+                    <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame
+
+pygame.init()
+screen = pygame.display.set_mode((<span class="number">600</span>, <span class="number">400</span>))
+
+<span class="comment"># ШАГ 1: Создаём объект шрифта</span>
+<span class="comment"># font.SysFont(название_шрифта, размер, жирный=False, курсив=False)</span>
+font = pygame.font.SysFont(<span class="string">"Arial"</span>, <span class="number">36</span>, bold=<span class="builtin">True</span>)
+
+<span class="comment"># ШАГ 2: Отрисовываем текст на поверхности</span>
+<span class="comment"># font.render(текст, сглаживание, цвет)</span>
+text_surface = font.render(<span class="string">"Привет, Pygame!"</span>, <span class="builtin">True</span>, (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>))
+
+<span class="comment"># ШАГ 3: Показываем на экране</span>
+<span class="comment"># screen.blit(поверхность, (x, y))</span>
+screen.blit(text_surface, (<span class="number">150</span>, <span class="number">200</span>))
+
+pygame.display.flip()</code></pre>
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3> Параметры функций</h3>
+                    <p><strong>pygame.font.SysFont():</strong></p>
+                    <ul>
+                        <li>Первый параметр — название шрифта (<span class="inline-code">"Arial"</span>, <span class="inline-code">"Courier"</span>, <span class="inline-code">"Times"</span>)</li>
+                        <li>Второй параметр — размер в пикселях</li>
+                        <li><span class="inline-code">bold=True</span> — жирный шрифт</li>
+                        <li><span class="inline-code">italic=True</span> — курсив</li>
+                    </ul>
+
+                    <p style="margin-top: 16px;"><strong>font.render():</strong></p>
+                    <ul>
+                        <li>Первый параметр — текст (строка)</li>
+                        <li>Второй параметр — сглаживание (<span class="inline-code">True</span> для чёткого текста)</li>
+                        <li>Третий параметр — цвет (R, G, B)</li>
+                    </ul>
+                </div>
+
+                <div class="viz-container">
+                    <div class="viz-header">
+                        <span>📝</span>
+                        <h3>Интерактив: отображение текста</h3>
+                    </div>
+                    <div class="viz-canvas-wrapper">
+                        <canvas id="canvas13" class="viz-canvas" width="400" height="200"></canvas>
+                    </div>
+                    <div class="viz-controls">
+                        <button class="viz-btn" onclick="viz13_showText()">Показать текст</button>
+                        <button class="viz-btn" onclick="viz13_changeText()">Изменить текст</button>
+                        <button class="viz-btn" onclick="viz13_reset()">🔄 Сброс</button>
+                    </div>
+                    <div class="viz-info" id="viz13Info">
+                        Нажмите «Показать текст», чтобы увидеть, как текст отображается на экране.
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3> Советы по работе с текстом</h3>
+                    <ul>
+                        <li>Создавайте объект шрифта <strong>один раз</strong> в начале программы, а не в цикле.</li>
+                        <li>Если текст меняется (например, счёт), пересоздавайте поверхность каждый кадр.</li>
+                        <li>Используйте <span class="inline-code">text_surface.get_rect()</span> для получения размеров текста.</li>
+                        <li>Для центрирования: <span class="inline-code">rect.center = (screen_width/2, screen_height/2)</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 14: МУЗЫКА И ЗВУКИ -->
+        <section class="slide" data-slide="14">
+            <span class="slide-number">СЛАЙД 14 / 16</span>
+            <h1 class="slide-title">Музыка и звуки (Sound and Music)</h1>
+            <p class="slide-subtitle">Разница между фоновой музыкой и звуковыми эффектами</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3>🎵 Два типа аудио в Pygame</h3>
+                    <p>Pygame предоставляет два разных инструмента для работы со звуком:</p>
+                    
+                    <p style="margin-top: 16px;"><strong>1. pygame.mixer.music — для фоновой музыки</strong></p>
+                    <ul>
+                        <li>Играет <strong>один файл</strong> в фоновом режиме</li>
+                        <li>Подходит для длинных музыкальных треков</li>
+                        <li>Можно ставить на паузу, возобновлять, менять громкость</li>
+                    </ul>
+
+                    <p style="margin-top: 16px;"><strong>2. pygame.mixer.Sound — для звуковых эффектов</strong></p>
+                    <ul>
+                        <li>Можно создать <strong>много объектов Sound</strong></li>
+                        <li>Подходит для коротких звуков (выстрел, прыжок, столкновение)</li>
+                        <li>Можно играть несколько звуков одновременно</li>
+                    </ul>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-label">Python — музыка и звуки</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    </div>
+                    <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame
+
+pygame.init()
+screen = pygame.display.set_mode((<span class="number">600</span>, <span class="number">400</span>))
+
+<span class="comment"># Инициализируем модуль звука</span>
+pygame.mixer.init()
+
+<span class="comment"># ФОНОВАЯ МУЗЫКА</span>
+<span class="comment"># Загружаем и запускаем музыку</span>
+pygame.mixer.music.load(<span class="string">"background.mp3"</span>)
+pygame.mixer.music.play(<span class="number">-1</span>)  <span class="comment"># -1 = бесконечный повтор</span>
+pygame.mixer.music.set_volume(<span class="number">0.5</span>)  <span class="comment"># Громкость от 0.0 до 1.0</span>
+
+<span class="comment"># ЗВУКОВЫЕ ЭФФЕКТЫ</span>
+<span class="comment"># Создаём объекты Sound</span>
+jump_sound = pygame.mixer.Sound(<span class="string">"jump.wav"</span>)
+shoot_sound = pygame.mixer.Sound(<span class="string">"shoot.wav"</span>)
+hit_sound = pygame.mixer.Sound(<span class="string">"hit.wav"</span>)
+
+running = <span class="builtin">True</span>
+<span class="keyword">while</span> running:
+    <span class="keyword">for</span> event <span class="keyword">in</span> pygame.event.get():
+        <span class="keyword">if</span> event.type == pygame.QUIT:
+            running = <span class="builtin">False</span>
+        
+        <span class="comment"># Воспроизводим звук при нажатии клавиши</span>
+        <span class="keyword">if</span> event.type == pygame.KEYDOWN:
+            <span class="keyword">if</span> event.key == pygame.K_SPACE:
+                jump_sound.play()  <span class="comment"># Играем звук прыжка</span>
+            <span class="keyword">if</span> event.key == pygame.K_f:
+                shoot_sound.play()  <span class="comment"># Играем звук выстрела</span>
+
+    screen.fill((<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))
+    pygame.display.flip()
+
+pygame.quit()</code></pre>
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3>📋 Методы для работы со звуком</h3>
+                    <p><strong>Для музыки (mixer.music):</strong></p>
+                    <ul>
+                        <li><span class="inline-code">pygame.mixer.music.load(filename)</span> — загрузить файл</li>
+                        <li><span class="inline-code">pygame.mixer.music.play(loops)</span> — играть (loops=-1 для бесконечного повтора)</li>
+                        <li><span class="inline-code">pygame.mixer.music.stop()</span> — остановить</li>
+                        <li><span class="inline-code">pygame.mixer.music.pause()</span> — пауза</li>
+                        <li><span class="inline-code">pygame.mixer.music.unpause()</span> — возобновить</li>
+                        <li><span class="inline-code">pygame.mixer.music.set_volume(value)</span> — громкость (0.0 до 1.0)</li>
+                    </ul>
+
+                    <p style="margin-top: 16px;"><strong>Для звуков (Sound):</strong></p>
+                    <ul>
+                        <li><span class="inline-code">sound = pygame.mixer.Sound(filename)</span> — создать объект</li>
+                        <li><span class="inline-code">sound.play()</span> — воспроизвести</li>
+                        <li><span class="inline-code">sound.stop()</span> — остановить</li>
+                        <li><span class="inline-code">sound.set_volume(value)</span> — громкость</li>
+                    </ul>
+                </div>
+
+                <div class="text-block">
+                    <h3>️ Важные моменты</h3>
+                    <ul>
+                        <li>Вызывайте <span class="inline-code">pygame.mixer.init()</span> после <span class="inline-code">pygame.init()</span></li>
+                        <li>Музыка поддерживает MP3, OGG, WAV</li>
+                        <li>Sound поддерживает только WAV и OGG</li>
+                        <li>Звуковые файлы должны быть в той же папке, что и программа</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 15: ПОЛНЫЙ ПРИМЕР -->
+        <section class="slide" data-slide="15">
+            <span class="slide-number">СЛАЙД 15 / 16</span>
+            <h1 class="slide-title">Полный пример: Мини-игра</h1>
+            <p class="slide-subtitle">Объединение всех концепций в одной программе</p>
+
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3>🎮 Что будет в игре</h3>
+                    <p>Создадим простую игру, где:</p>
+                    <ul>
+                        <li>Игрок (зелёный квадрат) управляется стрелками</li>
+                        <li>Враги (красные квадраты) падают сверху</li>
+                        <li>Счёт увеличивается, пока игрок жив</li>
+                        <li>При столкновении с врагом — игра заканчивается</li>
+                    </ul>
+                </div>
+
+                <div class="collapsible-code">
+                    <button class="collapse-btn" onclick="toggleCollapse(this)">
+                        <span>📄 Показать полный код мини-игры</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div class="collapse-content">
+                        <div class="code-container">
+                            <div class="code-header">
+                                <span class="code-label">Python — мини-игра</span>
+                                <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                            </div>
+                            <div class="code-body">
+<pre><code><span class="keyword">import</span> pygame
+<span class="keyword">import</span> random
+
+pygame.init()
+screen = pygame.display.set_mode((<span class="number">600</span>, <span class="number">400</span>))
+clock = pygame.time.Clock()
+font = pygame.font.SysFont(<span class="string">"Arial"</span>, <span class="number">24</span>)
+
+<span class="comment"># Класс игрока</span>
+<span class="keyword">class</span> <span class="function">Player</span>(pygame.sprite.Sprite):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        super().__init__()
+        self.image = pygame.Surface((<span class="number">40</span>, <span class="number">40</span>))
+        self.image.fill((<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>))
+        self.rect = self.image.get_rect()
+        self.rect.x = <span class="number">280</span>
+        self.rect.y = <span class="number">350</span>
+        self.speed = <span class="number">5</span>
+    
+    <span class="keyword">def</span> <span class="function">update</span>(self):
+        keys = pygame.key.get_pressed()
+        <span class="keyword">if</span> keys[pygame.K_LEFT] <span class="keyword">and</span> self.rect.x > <span class="number">0</span>:
+            self.rect.x -= self.speed
+        <span class="keyword">if</span> keys[pygame.K_RIGHT] <span class="keyword">and</span> self.rect.x < <span class="number">560</span>:
+            self.rect.x += self.speed
+
+<span class="comment"># Класс врага</span>
+<span class="keyword">class</span> <span class="function">Enemy</span>(pygame.sprite.Sprite):
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        super().__init__()
+        self.image = pygame.Surface((<span class="number">30</span>, <span class="number">30</span>))
+        self.image.fill((<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>))
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(<span class="number">0</span>, <span class="number">570</span>)
+        self.rect.y = <span class="number">-30</span>
+    
+    <span class="keyword">def</span> <span class="function">update</span>(self):
+        self.rect.y += <span class="number">3</span>
+        <span class="keyword">if</span> self.rect.y > <span class="number">400</span>:
+            self.kill()
+
+<span class="comment"># Создаём игрока и группу врагов</span>
+player = Player()
+enemies = pygame.sprite.Group()
+
+score = <span class="number">0</span>
+enemy_timer = <span class="number">0</span>
+running = <span class="builtin">True</span>
+game_over = <span class="builtin">False</span>
+
+<span class="keyword">while</span> running:
+    <span class="keyword">for</span> event <span class="keyword">in</span> pygame.event.get():
+        <span class="keyword">if</span> event.type == pygame.QUIT:
+            running = <span class="builtin">False</span>
+        <span class="keyword">if</span> event.type == pygame.KEYDOWN <span class="keyword">and</span> event.key == pygame.K_r <span class="keyword">and</span> game_over:
+            <span class="comment"># Перезапуск игры</span>
+            player = Player()
+            enemies = pygame.sprite.Group()
+            score = <span class="number">0</span>
+            game_over = <span class="builtin">False</span>
+
+    <span class="keyword">if not</span> game_over:
+        <span class="comment"># Обновление</span>
+        player.update()
+        
+        enemy_timer += <span class="number">1</span>
+        <span class="keyword">if</span> enemy_timer >= <span class="number">60</span>:  <span class="comment"># Новый враг каждую секунду</span>
+            enemies.add(Enemy())
+            enemy_timer = <span class="number">0</span>
+        
+        enemies.update()
+        
+        <span class="comment"># Проверка столкновений</span>
+        <span class="keyword">if</span> pygame.sprite.spritecollide(player, enemies, <span class="builtin">False</span>):
+            game_over = <span class="builtin">True</span>
+        
+        score += <span class="number">1</span>
+
+    <span class="comment"># Отрисовка</span>
+    screen.fill((<span class="number">30</span>, <span class="number">30</span>, <span class="number">30</span>))
+    
+    <span class="keyword">if not</span> game_over:
+        screen.blit(player.image, player.rect)
+        enemies.draw(screen)
+        
+        <span class="comment"># Показываем счёт</span>
+        score_text = font.render(<span class="string">f"Счёт: {score}"</span>, <span class="builtin">True</span>, (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>))
+        screen.blit(score_text, (<span class="number">10</span>, <span class="number">10</span>))
+    <span class="keyword">else</span>:
+        <span class="comment"># Экран Game Over</span>
+        game_over_text = font.render(<span class="string">"GAME OVER — Нажмите R для перезапуска"</span>, <span class="builtin">True</span>, (<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>))
+        screen.blit(game_over_text, (<span class="number">50</span>, <span class="number">200</span>))
+
+    pygame.display.flip()
+    clock.tick(<span class="number">60</span>)
+
+pygame.quit()</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3> Ключевые моменты кода</h3>
+                    <ol>
+                        <li><strong>Классы Sprite</strong> — Player и Enemy наследуют от pygame.sprite.Sprite</li>
+                        <li><strong>Метод update()</strong> — двигает игрока и врагов</li>
+                        <li><strong>Группа спрайтов</strong> — enemies хранит всех врагов</li>
+                        <li><strong>spritecollide()</strong> — проверяет столкновение игрока с врагами</li>
+                        <li><strong>get_pressed()</strong> — плавное управление игроком</li>
+                        <li><strong>Текст</strong> — показывает счёт на экране</li>
+                    </ol>
+                </div>
+
+                <div class="text-block">
+                    <h3> Что можно улучшить</h3>
+                    <ul>
+                        <li>Добавить звуки выстрелов и столкновений</li>
+                        <li>Сделать врагов разного размера и скорости</li>
+                        <li>Добавить бонусы (аптечки, усиления)</li>
+                        <li>Сохранять рекорд в файл</li>
+                        <li>Добавить уровни сложности</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЛАЙД 16: ИТОГИ -->
+        <section class="slide" data-slide="16">
+            <span class="slide-number">СЛАЙД 16 / 16</span>
+            <h1 class="slide-title">Итоги и следующие шаги</h1>
+            <p class="slide-subtitle">Краткое резюме пройденного пути</p>
+
+            <div class="slide-content">
+                <div class="text-block" style="border-left: 3px solid var(--accent-green);">
+                    <h3>✅ Что вы изучили</h3>
+                    <p>Вы прошли полный путь от основ Pygame до создания мини-игры:</p>
+                </div>
+
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <div class="icon">1️⃣</div>
+                        <h4>Основы</h4>
+                        <p>Инициализация, создание окна, игровой цикл, обработка событий</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="icon">2️⃣</div>
+                        <h4>Управление</h4>
+                        <p>Одиночные нажатия (event.get) и непрерывное движение (get_pressed)</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="icon">3️</div>
+                        <h4>Sprite класс</h4>
+                        <p>Создание объектов с image и rect, методы update() и kill()</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="icon">4️⃣</div>
+                        <h4>Группы</h4>
+                        <p>Управление множеством объектов, функции столкновений</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="icon">5️⃣</div>
+                        <h4>Интерфейс</h4>
+                        <p>Текст, шрифты, двойная буферизация</p>
+                    </div>
+                    <div class="concept-card">
+                        <div class="icon">6️</div>
+                        <h4>Медиа</h4>
+                        <p>Музыка и звуковые эффекты</p>
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <h3> Следующие шаги</h3>
+                    <p>Теперь, когда вы знаете основы, вы можете:</p>
+                    <ol>
+                        <li><strong>Создать свою игру</strong> — платформер, арканоид, космический шутер</li>
+                        <li><strong>Изучить продвинутые темы:</strong>
+                            <ul>
+                                <li>Анимация спрайтов (несколько кадров)</li>
+                                <li>Физика и гравитация</li>
+                                <li>Система частиц (эффекты взрывов)</li>
+                                <li>Карта уровня и скроллинг камеры</li>
+                            </ul>
+                        </li>
+                        <li><strong>Читать документацию</strong> — <span class="inline-code">pygame.org/docs</span></li>
+                        <li><strong>Смотреть примеры</strong> — на GitHub много открытых проектов</li>
+                        <li><strong>Присоединиться к сообществу</strong> — форумы, Discord-серверы</li>
+                    </ol>
+                </div>
+
+                <div class="text-block">
+                    <h3> Полезные ресурсы</h3>
+                    <ul>
+                        <li><strong>Официальная документация:</strong> pygame.org/docs</li>
+                        <li><strong>Примеры кода:</strong> github.com/pygame/pygame</li>
+                        <li><strong>Учебники:</strong> realpython.com, programiz.com</li>
+                        <li><strong>Видеоуроки:</strong> YouTube каналы по Pygame</li>
+                    </ul>
+                </div>
+
+                <div class="text-block" style="background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary)); border: 2px solid var(--accent-green);">
+                    <h3>🎉 Поздравляем!</h3>
+                    <p style="font-size: 1.1rem; color: var(--accent-green); font-weight: 500;">
+                        Вы изучили основы Pygame и готовы создавать свои игры!
+                    </p>
+                    <p style="margin-top: 12px;">
+                        Помните: лучший способ учиться — это практиковаться. Начните с простой игры и постепенно добавляйте новые функции.
+                    </p>
+                    <p style="margin-top: 12px; color: var(--text-secondary);">
+                        Удачи в разработке! 🎮
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <nav class="nav-container">
+        <button class="nav-btn" id="btnPrev" onclick="changeSlide(-1)" disabled>
+            ← Назад
+        </button>
+        <div class="nav-dots" id="navDots"></div>
+        <button class="nav-btn primary" id="btnNext" onclick="changeSlide(1)">
+            Далее →
+        </button>
+    </nav>
+
+    <div class="kbd-hint">
+        <span class="kbd">←</span> <span class="kbd">→</span> навигация
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 16;
+
+        function initNav() {
+            const dotsContainer = document.getElementById('navDots');
+            for (let i = 1; i <= totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'nav-dot' + (i === 1 ? ' active' : '');
+                dot.onclick = () => goToSlide(i);
+                dot.title = 'Слайд ' + i;
+                dotsContainer.appendChild(dot);
+            }
+            updateNav();
+        }
+
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            if (newSlide < 1 || newSlide > totalSlides) return;
+            goToSlide(newSlide);
+        }
+
+        function goToSlide(num) {
+            if (num < 1 || num > totalSlides) return;
+
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.querySelector(`[data-slide="${num}"]`).classList.add('active');
+
+            currentSlide = num;
+            updateNav();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (num === 2) initCanvas1();
+            if (num === 3) initCanvas3();
+            if (num === 4) initCanvas4();
+            if (num === 5) initCanvas5();
+            if (num === 7) initCanvas7();
+            if (num === 8) initCanvas8();
+            if (num === 9) initCanvas9();
+            if (num === 10) initCanvas10();
+            if (num === 11) initCanvas11();
+            if (num === 12) initCanvas12();
+            if (num === 13) initCanvas13();
+        }
+
+        function updateNav() {
+            document.getElementById('btnPrev').disabled = currentSlide === 1;
+            document.getElementById('btnNext').disabled = currentSlide === totalSlides;
+
+            document.querySelectorAll('.nav-dot').forEach((dot, idx) => {
+                dot.classList.toggle('active', idx + 1 === currentSlide);
+            });
+
+            const progress = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent =
+                'Слайд ' + currentSlide + ' из ' + totalSlides;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'TEXTAREA') return;
+            if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+
+        function toggleCollapse(btn) {
+            btn.classList.toggle('open');
+            const content = btn.nextElementSibling;
+            content.classList.toggle('open');
+        }
+
+        function copyCode(btn) {
+            const codeContainer = btn.closest('.code-container');
+            const code = codeContainer.querySelector('code').textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                btn.classList.add('copied');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✓ Скопировано';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = code;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+
+                btn.classList.add('copied');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✓ Скопировано';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        let canvas1State = { init: false, window: false, title: false };
+
+        function initCanvas1() {
+            const canvas = document.getElementById('canvas1');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            canvas1State = { init: false, window: false, title: false };
+            updateViz1Info('Нажмите кнопки по порядку, чтобы увидеть, как создаётся окно Pygame.');
+        }
+
+        function viz1_init() {
+            canvas1State.init = true;
+            const canvas = document.getElementById('canvas1');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#4ec9b0';
+            ctx.font = '14px Consolas, monospace';
+            ctx.fillText('✓ pygame.init() выполнен', 20, 30);
+            ctx.fillStyle = '#858585';
+            ctx.fillText('Системы запущены', 20, 55);
+
+            updateViz1Info('Шаг 1: pygame.init() запущен. Системы Pygame готовы к работе.');
+        }
+
+        function viz1_createWindow() {
+            if (!canvas1State.init) {
+                updateViz1Info('⚠ Сначала выполните pygame.init()');
+                return;
+            }
+            canvas1State.window = true;
+            const canvas = document.getElementById('canvas1');
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const wx = 40, wy = 40, ww = 320, wh = 180;
+            ctx.fillStyle = '#2d2d30';
+            ctx.fillRect(wx, wy, ww, wh);
+            ctx.strokeStyle = '#4ec9b0';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(wx, wy, ww, wh);
+
+            ctx.fillStyle = '#3e3e42';
+            ctx.fillRect(wx, wy, ww, 24);
+            ctx.fillStyle = '#d4d4d4';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('pygame window', wx + 8, wy + 16);
+
+            ctx.fillStyle = '#f48771';
+            ctx.beginPath();
+            ctx.arc(wx + ww - 16, wy + 12, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#4ec9b0';
+            ctx.font = '13px Consolas, monospace';
+            ctx.fillText('✓ Окно 400x250 создано', 20, canvas.height - 15);
+
+            updateViz1Info('Шаг 2: set_mode(400, 250) создало окно. Это ваш холст для рисования.');
+        }
+
+        function viz1_setTitle() {
+            if (!canvas1State.window) {
+                updateViz1Info('⚠ Сначала создайте окно');
+                return;
+            }
+            canvas1State.title = true;
+            const canvas = document.getElementById('canvas1');
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const wx = 40, wy = 40, ww = 320, wh = 180;
+            ctx.fillStyle = '#2d2d30';
+            ctx.fillRect(wx, wy, ww, wh);
+            ctx.strokeStyle = '#4ec9b0';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(wx, wy, ww, wh);
+
+            ctx.fillStyle = '#3e3e42';
+            ctx.fillRect(wx, wy, ww, 24);
+            ctx.fillStyle = '#dcdcaa';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('Моя первая игра', wx + 8, wy + 16);
+
+            ctx.fillStyle = '#f48771';
+            ctx.beginPath();
+            ctx.arc(wx + ww - 16, wy + 12, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#4ec9b0';
+            ctx.font = '13px Consolas, monospace';
+            ctx.fillText('✓ Заголовок изменён', 20, canvas.height - 15);
+
+            updateViz1Info('Шаг 3: set_caption() изменил заголовок окна. Окно полностью готово!');
+        }
+
+        function viz1_reset() {
+            initCanvas1();
+        }
+
+        function updateViz1Info(text) {
+            const el = document.getElementById('viz1Info');
+            if (el) el.textContent = text;
+        }
+
+        let canvas3Anim = null;
+        let canvas3Frame = 0;
+
+        function initCanvas3() {
+            const canvas = document.getElementById('canvas3');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            canvas3Frame = 0;
+            if (canvas3Anim) {
+                cancelAnimationFrame(canvas3Anim);
+                canvas3Anim = null;
+            }
+            document.getElementById('btnLoopStart').disabled = false;
+            document.getElementById('btnLoopStop').disabled = true;
+            updateViz3Info('Нажмите «Запустить цикл», чтобы увидеть, как программа повторяет действия.');
+        }
+
+        function viz3_start() {
+            const canvas = document.getElementById('canvas3');
+            const ctx = canvas.getContext('2d');
+            document.getElementById('btnLoopStart').disabled = true;
+            document.getElementById('btnLoopStop').disabled = false;
+            canvas3Frame = 0;
+
+            const steps = ['Слушаем события', 'Обновляем данные', 'Рисуем на экране', 'Показываем (flip)'];
+            const colors = ['#569cd6', '#dcdcaa', '#ce9178', '#4ec9b0'];
+
+            function animate() {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const stepIdx = canvas3Frame % 4;
+                const cycleNum = Math.floor(canvas3Frame / 4) + 1;
+
+                for (let i = 0; i < 4; i++) {
+                    const y = 30 + i * 40;
+                    const isActive = i === stepIdx;
+
+                    ctx.fillStyle = isActive ? colors[i] : '#3e3e42';
+                    ctx.fillRect(20, y, 360, 32);
+
+                    ctx.fillStyle = isActive ? '#000' : '#858585';
+                    ctx.font = (isActive ? 'bold ' : '') + '13px sans-serif';
+                    ctx.fillText((i + 1) + '. ' + steps[i], 30, y + 21);
+                }
+
+                ctx.fillStyle = '#4ec9b0';
+                ctx.font = '12px Consolas, monospace';
+                ctx.fillText('Кадр #' + cycleNum + ' | Шаг: ' + (stepIdx + 1) + '/4', 20, canvas.height - 15);
+
+                canvas3Frame++;
+                canvas3Anim = requestAnimationFrame(animate);
+            }
+
+            animate();
+            updateViz3Info('Цикл работает! Программа повторяет 4 шага снова и снова. Каждый повтор — это один кадр.');
+        }
+
+        function viz3_stop() {
+            if (canvas3Anim) {
+                cancelAnimationFrame(canvas3Anim);
+                canvas3Anim = null;
+            }
+            document.getElementById('btnLoopStart').disabled = false;
+            document.getElementById('btnLoopStop').disabled = true;
+            updateViz3Info('Цикл остановлен. В реальной программе это происходит при закрытии окна (running = False).');
+        }
+
+        function viz3_reset() {
+            viz3_stop();
+            initCanvas3();
+        }
+
+        function updateViz3Info(text) {
+            const el = document.getElementById('viz3Info');
+            if (el) el.textContent = text;
+        }
+
+        let canvas4Queue = [];
+
+        function initCanvas4() {
+            const canvas = document.getElementById('canvas4');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            canvas4Queue = [];
+            drawCanvas4();
+            updateViz4Info('Добавляйте события в очередь, затем нажмите «Обработать», чтобы увидеть, как программа их читает.');
+        }
+
+        function drawCanvas4() {
+            const canvas = document.getElementById('canvas4');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#4ec9b0';
+            ctx.font = 'bold 13px sans-serif';
+            ctx.fillText('Очередь событий:', 15, 25);
+
+            if (canvas4Queue.length === 0) {
+                ctx.fillStyle = '#858585';
+                ctx.font = '13px sans-serif';
+                ctx.fillText('(очередь пуста)', 15, 60);
+                return;
+            }
+
+            const colors = {
+                'QUIT': '#f48771',
+                'KEYDOWN': '#dcdcaa',
+                'MOUSE': '#569cd6'
+            };
+
+            canvas4Queue.forEach((evt, idx) => {
+                const y = 40 + idx * 35;
+                const color = colors[evt.type] || '#4ec9b0';
+
+                ctx.fillStyle = '#2d2d30';
+                ctx.fillRect(15, y, 370, 28);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+                ctx.strokeRect(15, y, 370, 28);
+
+                ctx.fillStyle = color;
+                ctx.font = 'bold 12px Consolas, monospace';
+                ctx.fillText(evt.type, 25, y + 19);
+
+                ctx.fillStyle = '#d4d4d4';
+                ctx.font = '12px Consolas, monospace';
+                ctx.fillText(evt.detail, 130, y + 19);
+            });
+        }
+
+        function viz4_addEvent(type) {
+            let detail = '';
+            if (type === 'QUIT') detail = 'user clicked X';
+            else if (type === 'KEYDOWN: A') detail = 'key = K_a';
+            else if (type === 'MOUSE') detail = 'pos = (150, 200)';
+
+            canvas4Queue.push({ type: type, detail: detail });
+            drawCanvas4();
+            updateViz4Info('Событие добавлено в очередь. Всего событий: ' + canvas4Queue.length + '. Нажмите «Обработать», чтобы прочитать их.');
+        }
+
+        function viz4_process() {
+            if (canvas4Queue.length === 0) {
+                updateViz4Info('Очередь пуста. Добавьте события сначала.');
+                return;
+            }
+
+            const canvas = document.getElementById('canvas4');
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#4ec9b0';
+            ctx.font = 'bold 14px sans-serif';
+            ctx.fillText('Обработка событий:', 15, 25);
+
+            canvas4Queue.forEach((evt, idx) => {
+                const y = 45 + idx * 45;
+                ctx.fillStyle = '#2d2d30';
+                ctx.fillRect(15, y, 370, 38);
+
+                ctx.fillStyle = '#d4d4d4';
+                ctx.font = '12px Consolas, monospace';
+                ctx.fillText('for event in event.get():', 25, y + 16);
+
+                ctx.fillStyle = '#4ec9b0';
+                ctx.font = '11px Consolas, monospace';
+                let action = '';
+                if (evt.type === 'QUIT') action = '→ running = False';
+                else if (evt.type.includes('KEYDOWN')) action = '→ print("Нажата клавиша")';
+                else if (evt.type === 'MOUSE') action = '→ обработать клик мыши';
+                ctx.fillText('  if type == ' + evt.type + ': ' + action, 25, y + 32);
+            });
+
+            canvas4Queue = [];
+            updateViz4Info('Все события обработаны! Очередь очищена. В реальном цикле это происходит каждый кадр.');
+        }
+
+        function viz4_reset() {
+            initCanvas4();
+        }
+
+        function updateViz4Info(text) {
+            const el = document.getElementById('viz4Info');
+            if (el) el.textContent = text;
+        }
+
+        let canvas5X = 175;
+        let canvas5Y = 100;
+        let canvas5MoveInterval = null;
+        let canvas5Direction = null;
+
+        function initCanvas5() {
+            const canvas = document.getElementById('canvas5');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas5X = 175;
+            canvas5Y = 100;
+            if (canvas5MoveInterval) {
+                clearInterval(canvas5MoveInterval);
+                canvas5MoveInterval = null;
+            }
+            canvas5Direction = null;
+            drawCanvas5();
+            updateViz5Info('Нажмите и удерживайте кнопки направления, чтобы двигать квадрат. Отпустите — движение остановится (как key.get_pressed()).');
+        }
+
+        function drawCanvas5() {
+            const canvas = document.getElementById('canvas5');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#27ae60';
+            ctx.fillRect(canvas5X, canvas5Y, 50, 50);
+
+            ctx.strokeStyle = '#4ec9b0';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function viz5_startMove(direction) {
+            if (canvas5MoveInterval) {
+                clearInterval(canvas5MoveInterval);
+            }
+            canvas5Direction = direction;
+            canvas5MoveInterval = setInterval(() => {
+                const speed = 5;
+                if (direction === 'left' && canvas5X > 0) canvas5X -= speed;
+                if (direction === 'right' && canvas5X < 350) canvas5X += speed;
+                if (direction === 'up' && canvas5Y > 0) canvas5Y -= speed;
+                if (direction === 'down' && canvas5Y < 200) canvas5Y += speed;
+                drawCanvas5();
+            }, 30);
+            updateViz5Info('Квадрат двигается в направлении: ' + direction + '. Отпустите кнопку, чтобы остановить.');
+        }
+
+        function viz5_stopMove() {
+            if (canvas5MoveInterval) {
+                clearInterval(canvas5MoveInterval);
+                canvas5MoveInterval = null;
+            }
+            canvas5Direction = null;
+        }
+
+        function viz5_reset() {
+            initCanvas5();
+        }
+
+        function updateViz5Info(text) {
+            const el = document.getElementById('viz5Info');
+            if (el) el.textContent = text;
+        }
+
+        let canvas7State = { showImage: false, showRect: false };
+
+        function initCanvas7() {
+            const canvas = document.getElementById('canvas7');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            canvas7State = { showImage: false, showRect: false };
+            drawCanvas7();
+            updateViz7Info('Нажмите кнопки, чтобы увидеть разницу между image (внешность) и rect (рамка позиции).');
+        }
+
+        function drawCanvas7() {
+            const canvas = document.getElementById('canvas7');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const x = 150, y = 100, w = 100, h = 100;
+
+            if (canvas7State.showImage) {
+                ctx.fillStyle = '#27ae60';
+                ctx.fillRect(x, y, w, h);
+                ctx.fillStyle = '#d4d4d4';
+                ctx.font = '12px Consolas, monospace';
+                ctx.fillText('self.image', x + 15, y + 55);
+            }
+
+            if (canvas7State.showRect) {
+                ctx.strokeStyle = '#4ec9b0';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([8, 4]);
+                ctx.strokeRect(x - 10, y - 10, w + 20, h + 20);
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#4ec9b0';
+                ctx.font = '12px Consolas, monospace';
+                ctx.fillText('self.rect', x + 15, y - 20);
+            }
+
+            if (!canvas7State.showImage && !canvas7State.showRect) {
+                ctx.fillStyle = '#858585';
+                ctx.font = '14px sans-serif';
+                ctx.fillText('Нажмите кнопки выше', 120, 130);
+            }
+        }
+
+        function viz7_showImage() {
+            canvas7State.showImage = true;
+            canvas7State.showRect = false;
+            drawCanvas7();
+            updateViz7Info('self.image — это поверхность (картинка). Здесь это зелёный квадрат 100x100 пикселей.');
+        }
+
+        function viz7_showRect() {
+            canvas7State.showImage = false;
+            canvas7State.showRect = true;
+            drawCanvas7();
+            updateViz7Info('self.rect — это прямоугольник (рамка). Он определяет позицию (x, y) и размер (ширина, высота).');
+        }
+
+        function viz7_showBoth() {
+            canvas7State.showImage = true;
+            canvas7State.showRect = true;
+            drawCanvas7();
+            updateViz7Info('Вместе: image — это картинка, rect — это рамка вокруг неё. Pygame рисует image по координатам из rect.');
+        }
+
+        function viz7_reset() {
+            initCanvas7();
+        }
+
+        function updateViz7Info(text) {
+            const el = document.getElementById('viz7Info');
+            if (el) el.textContent = text;
+        }
+
+        let canvas8X = 50;
+
+        function initCanvas8() {
+            const canvas = document.getElementById('canvas8');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas8X = 50;
+            drawCanvas8();
+            updateViz8Info('Нажмите «Вызвать update()», чтобы сдвинуть квадрат вправо на 30 пикселей (как в коде: self.rect.x += 30).');
+        }
+
+        function drawCanvas8() {
+            const canvas = document.getElementById('canvas8');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#27ae60';
+            ctx.fillRect(canvas8X, 75, 50, 50);
+
+            ctx.strokeStyle = '#4ec9b0';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(20, 150);
+            ctx.lineTo(380, 150);
+            ctx.stroke();
+
+            ctx.fillStyle = '#858585';
+            ctx.font = '11px Consolas, monospace';
+            ctx.fillText('x=0', 20, 170);
+            ctx.fillText('x=400', 350, 170);
+            ctx.fillText('x=' + canvas8X, canvas8X, 190);
+        }
+
+        function viz8_update() {
+            canvas8X += 30;
+            if (canvas8X > 350) {
+                canvas8X = 50;
+            }
+            drawCanvas8();
+            updateViz8Info('update() вызван! self.rect.x += 30. Квадрат сдвинулся вправо. Новая позиция x=' + canvas8X);
+        }
+
+        function viz8_updateMultiple() {
+            for (let i = 0; i < 5; i++) {
+                canvas8X += 30;
+                if (canvas8X > 350) {
+                    canvas8X = 50;
+                }
+            }
+            drawCanvas8();
+            updateViz8Info('update() вызван 5 раз! Квадрат сдвинулся на 150 пикселей вправо. Новая позиция x=' + canvas8X);
+        }
+
+        function viz8_reset() {
+            initCanvas8();
+        }
+
+        function updateViz8Info(text) {
+            const el = document.getElementById('viz8Info');
+            if (el) el.textContent = text;
+        }
+
+        let canvas9Visible = false;
+
+        function initCanvas9() {
+            const canvas = document.getElementById('canvas9');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas9Visible = false;
+            drawCanvas9();
+            updateViz9Info('Нажмите «Показать спрайт», затем «Вызвать kill()», чтобы увидеть, как спрайт исчезает.');
+        }
+
+        function drawCanvas9() {
+            const canvas = document.getElementById('canvas9');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (canvas9Visible) {
+                ctx.fillStyle = '#f39c12';
+                ctx.fillRect(175, 75, 50, 50);
+                ctx.fillStyle = '#d4d4d4';
+                ctx.font = '12px Consolas, monospace';
+                ctx.fillText('Спрайт виден', 160, 160);
+            } else {
+                ctx.strokeStyle = '#4ec9b0';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.strokeRect(175, 75, 50, 50);
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#858585';
+                ctx.font = '12px Consolas, monospace';
+                ctx.fillText('Спрайт удалён (kill)', 140, 160);
+            }
+        }
+
+        function viz9_show() {
+            canvas9Visible = true;
+            drawCanvas9();
+            updateViz9Info('Спрайт создан и виден на экране. Теперь нажмите «Вызвать kill()», чтобы удалить его.');
+        }
+
+        function viz9_kill() {
+            if (!canvas9Visible) {
+                updateViz9Info('⚠ Сначала покажите спрайт кнопкой «Показать спрайт»');
+                return;
+            }
+            canvas9Visible = false;
+            drawCanvas9();
+            updateViz9Info('✓ kill() вызван! Спрайт удалён из группы и больше не рисуется на экране.');
+        }
+
+        function viz9_reset() {
+            initCanvas9();
+        }
+
+        function updateViz9Info(text) {
+            const el = document.getElementById('viz9Info');
+            if (el) el.textContent = text;
+        }
+
+        let canvas10PlayerX = 50;
+        let canvas10Enemies = [
+            { x: 150, y: 100, hit: false },
+            { x: 250, y: 100, hit: false },
+            { x: 350, y: 100, hit: false }
+        ];
+
+        function initCanvas10() {
+            const canvas = document.getElementById('canvas10');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas10PlayerX = 50;
+            canvas10Enemies = [
+                { x: 150, y: 100, hit: false },
+                { x: 250, y: 100, hit: false },
+                { x: 350, y: 100, hit: false }
+            ];
+            drawCanvas10();
+            updateViz10Info('Двигайте синего игрока вправо. Нажмите «Проверить spritecollide», чтобы увидеть, с какими красными врагами он пересекается.');
+        }
+
+        function drawCanvas10() {
+            const canvas = document.getElementById('canvas10');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            canvas10Enemies.forEach(enemy => {
+                ctx.fillStyle = enemy.hit ? '#ff6b6b' : '#e74c3c';
+                ctx.fillRect(enemy.x, enemy.y, 40, 40);
+            });
+
+            ctx.fillStyle = '#3498db';
+            ctx.fillRect(canvas10PlayerX, 100, 40, 40);
+
+            ctx.fillStyle = '#858585';
+            ctx.font = '12px Consolas, monospace';
+            ctx.fillText('Игрок (синий)', 20, 230);
+            ctx.fillText('Враги (красные)', 150, 230);
+        }
+
+        function viz10_movePlayer() {
+            canvas10PlayerX += 50;
+            if (canvas10PlayerX > 310) {
+                canvas10PlayerX = 50;
+            }
+            canvas10Enemies.forEach(e => e.hit = false);
+            drawCanvas10();
+            updateViz10Info('Игрок сдвинут вправо. Новая позиция x=' + canvas10PlayerX);
+        }
+
+        function viz10_checkCollision() {
+            let hitCount = 0;
+            canvas10Enemies.forEach(enemy => {
+                const playerRect = { x: canvas10PlayerX, y: 100, w: 40, h: 40 };
+                const enemyRect = { x: enemy.x, y: enemy.y, w: 40, h: 40 };
+
+                if (playerRect.x < enemyRect.x + enemyRect.w &&
+                    playerRect.x + playerRect.w > enemyRect.x &&
+                    playerRect.y < enemyRect.y + enemyRect.h &&
+                    playerRect.y + playerRect.h > enemyRect.y) {
+                    enemy.hit = true;
+                    hitCount++;
+                }
+            });
+
+            drawCanvas10();
+            updateViz10Info('spritecollide проверен! Найдено столкновений: ' + hitCount + '. Подсвеченные враги — те, с которыми пересекается игрок.');
+        }
+
+        function viz10_reset() {
+            initCanvas10();
+        }
+
+        function updateViz10Info(text) {
+            const el = document.getElementById('viz10Info');
+            if (el) el.textContent = text;
+        }
+
+        let canvas11PlayerX = 50;
+        let canvas11EnemyX = 250;
+
+        function initCanvas11() {
+            const canvas = document.getElementById('canvas11');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas11PlayerX = 50;
+            canvas11EnemyX = 250;
+            drawCanvas11();
+            updateViz11Info('Двигайте синего игрока вправо к красному врагу. Нажмите «Проверить столкновение», чтобы узнать, пересекаются ли они.');
+        }
+
+        function drawCanvas11() {
+            const canvas = document.getElementById('canvas11');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#e74c3c';
+            ctx.fillRect(canvas11EnemyX, 75, 50, 50);
+
+            ctx.fillStyle = '#3498db';
+            ctx.fillRect(canvas11PlayerX, 75, 50, 50);
+
+            ctx.fillStyle = '#858585';
+            ctx.font = '12px Consolas, monospace';
+            ctx.fillText('Игрок', canvas11PlayerX + 10, 160);
+            ctx.fillText('Враг', canvas11EnemyX + 10, 160);
+        }
+
+        function viz11_movePlayer() {
+            canvas11PlayerX += 30;
+            if (canvas11PlayerX > 200) {
+                canvas11PlayerX = 50;
+            }
+            drawCanvas11();
+            updateViz11Info('Игрок сдвинут вправо. Новая позиция x=' + canvas11PlayerX);
+        }
+
+        function viz11_checkCollision() {
+            const playerRect = { x: canvas11PlayerX, y: 75, w: 50, h: 50 };
+            const enemyRect = { x: canvas11EnemyX, y: 75, w: 50, h: 50 };
+
+            const collision = playerRect.x < enemyRect.x + enemyRect.w &&
+                             playerRect.x + playerRect.w > enemyRect.x &&
+                             playerRect.y < enemyRect.y + enemyRect.h &&
+                             playerRect.y + playerRect.h > enemyRect.y;
+
+            drawCanvas11();
+
+            const canvas = document.getElementById('canvas11');
+            const ctx = canvas.getContext('2d');
+
+            if (collision) {
+                ctx.strokeStyle = '#f39c12';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(canvas11PlayerX - 5, 70, 60, 60);
+                ctx.strokeRect(canvas11EnemyX - 5, 70, 60, 60);
+                ctx.fillStyle = '#f39c12';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.fillText('СТОЛКНОВЕНИЕ!', 130, 180);
+                updateViz11Info('✓ collide_rect() вернул True! Спрайты пересекаются.');
+            } else {
+                ctx.fillStyle = '#4ec9b0';
+                ctx.font = '14px sans-serif';
+                ctx.fillText('Нет столкновения', 130, 180);
+                updateViz11Info('✗ collide_rect() вернул False. Спрайты не пересекаются.');
+            }
+        }
+
+        function viz11_reset() {
+            initCanvas11();
+        }
+
+        function updateViz11Info(text) {
+            const el = document.getElementById('viz11Info');
+            if (el) el.textContent = text;
+        }
+
+        let canvas12HiddenShapes = [];
+        let canvas12VisibleShapes = [];
+
+        function initCanvas12() {
+            const canvasV = document.getElementById('canvas12Visible');
+            const canvasH = document.getElementById('canvas12Hidden');
+            if (!canvasV || !canvasH) return;
+
+            const ctxV = canvasV.getContext('2d');
+            const ctxH = canvasH.getContext('2d');
+
+            ctxV.fillStyle = '#ffffff';
+            ctxV.fillRect(0, 0, canvasV.width, canvasV.height);
+            ctxH.fillStyle = '#ffffff';
+            ctxH.fillRect(0, 0, canvasH.width, canvasH.height);
+
+            canvas12HiddenShapes = [];
+            canvas12VisibleShapes = [];
+
+            drawCanvas12();
+            updateViz12Info('1. Нажмите «Нарисовать фигуру» — она появится в невидимом буфере.\n2. Нажмите «display.flip()» — буферы поменяются, и фигура станет видимой.');
+        }
+
+        function drawCanvas12() {
+            const canvasV = document.getElementById('canvas12Visible');
+            const canvasH = document.getElementById('canvas12Hidden');
+            const ctxV = canvasV.getContext('2d');
+            const ctxH = canvasH.getContext('2d');
+
+            ctxV.fillStyle = '#ffffff';
+            ctxV.fillRect(0, 0, canvasV.width, canvasV.height);
+            canvas12VisibleShapes.forEach(shape => {
+                ctxV.fillStyle = shape.color;
+                if (shape.type === 'rect') {
+                    ctxV.fillRect(shape.x, shape.y, shape.w, shape.h);
+                } else if (shape.type === 'circle') {
+                    ctxV.beginPath();
+                    ctxV.arc(shape.cx, shape.cy, shape.r, 0, Math.PI * 2);
+                    ctxV.fill();
+                }
+            });
+
+            ctxH.fillStyle = '#ffffff';
+            ctxH.fillRect(0, 0, canvasH.width, canvasH.height);
+
+            canvas12VisibleShapes.forEach(shape => {
+                ctxH.fillStyle = shape.color;
+                if (shape.type === 'rect') {
+                    ctxH.fillRect(shape.x, shape.y, shape.w, shape.h);
+                } else if (shape.type === 'circle') {
+                    ctxH.beginPath();
+                    ctxH.arc(shape.cx, shape.cy, shape.r, 0, Math.PI * 2);
+                    ctxH.fill();
+                }
+            });
+
+            canvas12HiddenShapes.forEach(shape => {
+                ctxH.fillStyle = shape.color;
+                ctxH.globalAlpha = 0.5;
+                if (shape.type === 'rect') {
+                    ctxH.fillRect(shape.x, shape.y, shape.w, shape.h);
+                } else if (shape.type === 'circle') {
+                    ctxH.beginPath();
+                    ctxH.arc(shape.cx, shape.cy, shape.r, 0, Math.PI * 2);
+                    ctxH.fill();
+                }
+                ctxH.globalAlpha = 1.0;
+            });
+
+            ctxH.strokeStyle = '#4ec9b0';
+            ctxH.lineWidth = 2;
+            ctxH.setLineDash([5, 5]);
+            ctxH.strokeRect(2, 2, canvasH.width - 4, canvasH.height - 4);
+            ctxH.setLineDash([]);
+        }
+
+        function viz12_draw() {
+            const types = ['rect', 'circle'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            const colors = ['#e74c3c', '#27ae60', '#3498db', '#f39c12', '#9b59b6'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            let shape;
+            if (type === 'rect') {
+                shape = {
+                    type: 'rect',
+                    x: 20 + Math.random() * 80,
+                    y: 20 + Math.random() * 60,
+                    w: 40 + Math.random() * 40,
+                    h: 30 + Math.random() * 30,
+                    color: color
+                };
+            } else {
+                shape = {
+                    type: 'circle',
+                    cx: 40 + Math.random() * 100,
+                    cy: 40 + Math.random() * 60,
+                    r: 15 + Math.random() * 20,
+                    color: color
+                };
+            }
+
+            canvas12HiddenShapes.push(shape);
+            drawCanvas12();
+            updateViz12Info('Фигура нарисована в невидимом буфере (пунктирная рамка). На видимом экране её ещё нет. Нажмите «display.flip()» чтобы показать.');
+        }
+
+        function viz12_flip() {
+            if (canvas12HiddenShapes.length === 0) {
+                updateViz12Info('Невидимый буфер пуст. Сначала нарисуйте фигуру.');
+                return;
+            }
+
+            canvas12VisibleShapes = canvas12VisibleShapes.concat(canvas12HiddenShapes);
+            canvas12HiddenShapes = [];
+            drawCanvas12();
+            updateViz12Info('✓ display.flip() выполнен! Буферы поменялись местами. Фигуры теперь видны на экране.');
+        }
+
+        function viz12_reset() {
+            initCanvas12();
+        }
+
+        function updateViz12Info(text) {
+            const el = document.getElementById('viz12Info');
+            if (el) el.textContent = text;
+        }
+
+        let canvas13Text = '';
+
+        function initCanvas13() {
+            const canvas = document.getElementById('canvas13');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            canvas13Text = '';
+            updateViz13Info('Нажмите «Показать текст», чтобы увидеть, как текст отображается на экране.');
+        }
+
+        function viz13_showText() {
+            const canvas = document.getElementById('canvas13');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            canvas13Text = 'Привет, Pygame!';
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 28px Arial';
+            ctx.fillText(canvas13Text, 80, 110);
+
+            updateViz13Info('Текст отображён на экране. В Pygame это делается через font.render() и screen.blit().');
+        }
+
+        function viz13_changeText() {
+            const canvas = document.getElementById('canvas13');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const texts = ['Счёт: 100', 'GAME OVER', 'Уровень 2', 'Победа!'];
+            canvas13Text = texts[Math.floor(Math.random() * texts.length)];
+
+            ctx.fillStyle = '#4ec9b0';
+            ctx.font = 'bold 28px Arial';
+            ctx.fillText(canvas13Text, 100, 110);
+
+            updateViz13Info('Текст изменён на: "' + canvas13Text + '". В игре текст меняется каждый кадр (например, счёт).');
+        }
+
+        function viz13_reset() {
+            initCanvas13();
+        }
+
+        function updateViz13Info(text) {
+            const el = document.getElementById('viz13Info');
+            if (el) el.textContent = text;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNav();
+        });
+    </script>
+</body>
+</html>
